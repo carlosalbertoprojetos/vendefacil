@@ -1,0 +1,246 @@
+{% extends 'base/base.html' %}
+{% block title %}Configurações WhatsApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_messages.html' %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+          <i class="fab fa-whatsapp text-success me-2"></i>
+          Configurações WhatsApp
+        </h1>
+        <div class="badge bg-success">
+          <i class="fas fa-check-circle me-1"></i>
+          Conectado
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Status da Conexão -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-link me-2"></i>
+            Status da Conexão
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="me-3">
+              <i class="fas fa-circle text-success" style="font-size: 1.2rem;"></i>
+            </div>
+            <div>
+              <h6 class="mb-0">WhatsApp Conectado</h6>
+              <small class="text-muted">Última conexão: há 2 minutos</small>
+            </div>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-success" onclick="testarConexao()">
+              <i class="fas fa-sync-alt me-2"></i>Testar Conexão
+            </button>
+            <button class="btn btn-outline-danger" onclick="desconectarWhatsApp()">
+              <i class="fas fa-unlink me-2"></i>Desconectar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configurações de Mensagens -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-cog me-2"></i>
+            Configurações de Mensagens
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="numero_whatsapp" class="form-label">Número do WhatsApp</label>
+                <input type="tel" class="form-control" id="numero_whatsapp" name="numero_whatsapp" 
+                       value="+55 11 99999-9999" data-mask="+00 (00) 00000-0000">
+                <div class="form-text">Número que será usado para enviar mensagens</div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="nome_empresa" class="form-label">Nome da Empresa</label>
+                <input type="text" class="form-control" id="nome_empresa" name="nome_empresa" 
+                       value="VendaSimples">
+                <div class="form-text">Nome que aparecerá nas mensagens</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="mensagem_pedido" class="form-label">Mensagem de Pedido</label>
+              <textarea class="form-control" id="mensagem_pedido" name="mensagem_pedido" rows="4"
+                        placeholder="Digite a mensagem que será enviada quando um pedido for realizado...">Olá! Seu pedido foi realizado com sucesso! 🎉
+
+📦 **Pedido:** #{{pedido_numero}}
+💰 **Total:** R$ {{pedido_total}}
+📅 **Data:** {{pedido_data}}
+
+Acompanhe seu pedido em tempo real e receba atualizações automáticas.
+
+Obrigado por escolher a VendaSimples! 🛍️</textarea>
+              <div class="form-text">Use as variáveis: {{pedido_numero}}, {{pedido_total}}, {{pedido_data}}, {{cliente_nome}}</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="mensagem_entrega" class="form-label">Mensagem de Entrega</label>
+              <textarea class="form-control" id="mensagem_entrega" name="mensagem_entrega" rows="3"
+                        placeholder="Digite a mensagem que será enviada quando o pedido for enviado...">🚚 **Seu pedido está a caminho!**
+
+📦 Pedido: #{{pedido_numero}}
+🚛 Código de rastreamento: {{codigo_rastreamento}}
+📅 Previsão de entrega: {{previsao_entrega}}
+
+Acompanhe seu pedido: {{link_rastreamento}}
+
+Obrigado! 🎉</textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="enviar_pedido" name="enviar_pedido" checked>
+                  <label class="form-check-label" for="enviar_pedido">
+                    Enviar mensagem quando pedido for realizado
+                  </label>
+                </div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="enviar_entrega" name="enviar_entrega" checked>
+                  <label class="form-check-label" for="enviar_entrega">
+                    Enviar mensagem quando pedido for enviado
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Salvar Configurações
+              </button>
+              <button type="button" class="btn btn-outline-secondary" onclick="testarMensagem()">
+                <i class="fas fa-paper-plane me-2"></i>Testar Mensagem
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estatísticas -->
+  <div class="row g-4 mt-2">
+    <div class="col-lg-3 col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-paper-plane text-primary mb-2" style="font-size: 2rem;"></i>
+          <h4 class="text-primary">1,234</h4>
+          <p class="text-muted mb-0">Mensagens Enviadas</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-check-circle text-success mb-2" style="font-size: 2rem;"></i>
+          <h4 class="text-success">98.5%</h4>
+          <p class="text-muted mb-0">Taxa de Entrega</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-clock text-warning mb-2" style="font-size: 2rem;"></i>
+          <h4 class="text-warning">2.3s</h4>
+          <p class="text-muted mb-0">Tempo Médio</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-calendar-day text-info mb-2" style="font-size: 2rem;"></i>
+          <h4 class="text-info">156</h4>
+          <p class="text-muted mb-0">Hoje</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Máscara para número do WhatsApp
+  $('#numero_whatsapp').mask('+00 (00) 00000-0000');
+});
+
+function testarConexao() {
+  showLoading('Testando conexão com WhatsApp...');
+  
+  // Simular teste de conexão
+  setTimeout(() => {
+    hideLoading();
+    showSuccess('Conexão com WhatsApp estabelecida com sucesso!');
+  }, 2000);
+}
+
+function desconectarWhatsApp() {
+  showConfirm(
+    'Deseja desconectar o WhatsApp?',
+    'Confirmar Desconexão',
+    function() {
+      showLoading('Desconectando WhatsApp...');
+      
+      setTimeout(() => {
+        hideLoading();
+        showSuccess('WhatsApp desconectado com sucesso!');
+        // Recarregar página para atualizar status
+        setTimeout(() => location.reload(), 1000);
+      }, 1500);
+    }
+  );
+}
+
+function testarMensagem() {
+  const numero = document.getElementById('numero_whatsapp').value;
+  if (!numero) {
+    showError('Por favor, informe o número do WhatsApp primeiro.');
+    return;
+  }
+  
+  showConfirm(
+    `Deseja enviar uma mensagem de teste para ${numero}?`,
+    'Testar Mensagem',
+    function() {
+      showLoading('Enviando mensagem de teste...');
+      
+      setTimeout(() => {
+        hideLoading();
+        showSuccess('Mensagem de teste enviada com sucesso!');
+      }, 2000);
+    }
+  );
+}
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+/* Custom CSS for VendaSimples */
+
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #64748b;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #06b6d4;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8fafc;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.form-control {
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+}
+
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+.table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f8fafc;
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.text-muted {
+    color: #6b7280 !important;
+}
+
+.bg-light {
+    background-color: #f8fafc !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Custom components */
+.product-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+}
+
+.price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--success-color);
+}
+
+.price-promotional {
+    color: var(--danger-color);
+}
+
+.stock-low {
+    color: var(--warning-color);
+}
+
+.stock-out {
+    color: var(--danger-color);
+}
+
+/* Loading spinner */
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Status badges */
+.status-pendente {
+    background-color: var(--warning-color);
+}
+
+.status-confirmado {
+    background-color: var(--info-color);
+}
+
+.status-preparando {
+    background-color: var(--primary-color);
+}
+
+.status-pronto {
+    background-color: var(--success-color);
+}
+
+.status-entregue {
+    background-color: var(--success-color);
+}
+
+.status-cancelado {
+    background-color: var(--danger-color);
+}

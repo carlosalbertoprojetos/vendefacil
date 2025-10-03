@@ -1,0 +1,133 @@
+{% comment %}
+Template para exibir validação de campos em tempo real.
+Uso: {% include 'partials/_field_validation.html' with field=form.field_name %}
+{% endcomment %}
+
+<div class="field-validation" data-field="{{ field.name }}">
+  {% if field.errors %}
+    <div class="invalid-feedback d-block">
+      {% for error in field.errors %}
+        <div class="d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle me-1"></i>
+          <span>{{ error }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  
+  {% if field.help_text %}
+    <div class="form-text">
+      <i class="fas fa-info-circle me-1"></i>
+      {{ field.help_text }}
+    </div>
+  {% endif %}
+  
+  <div class="field-validation-feedback d-none">
+    <div class="valid-feedback">
+      <i class="fas fa-check-circle me-1"></i>
+      Campo válido
+    </div>
+    <div class="invalid-feedback">
+      <i class="fas fa-exclamation-triangle me-1"></i>
+      <span class="error-message"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const field = document.querySelector('[data-field="{{ field.name }}"]');
+  const input = field.querySelector('input, select, textarea');
+  const validationFeedback = field.querySelector('.field-validation-feedback');
+  const validFeedback = validationFeedback.querySelector('.valid-feedback');
+  const invalidFeedback = validationFeedback.querySelector('.invalid-feedback');
+  const errorMessage = invalidFeedback.querySelector('.error-message');
+  
+  if (input && validationFeedback) {
+    // Função para validar campo
+    function validateField() {
+      const value = input.value.trim();
+      const fieldName = input.name;
+      
+      // Limpar validação anterior
+      input.classList.remove('is-valid', 'is-invalid');
+      validationFeedback.classList.add('d-none');
+      
+      // Validações básicas
+      let isValid = true;
+      let errorMsg = '';
+      
+      // Verificar se é obrigatório
+      if (input.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMsg = 'Este campo é obrigatório.';
+      }
+      
+      // Verificar tamanho mínimo
+      const minLength = input.getAttribute('minlength');
+      if (minLength && value.length < parseInt(minLength)) {
+        isValid = false;
+        errorMsg = `Este campo deve ter pelo menos ${minLength} caracteres.`;
+      }
+      
+      // Verificar tamanho máximo
+      const maxLength = input.getAttribute('maxlength');
+      if (maxLength && value.length > parseInt(maxLength)) {
+        isValid = false;
+        errorMsg = `Este campo deve ter no máximo ${maxLength} caracteres.`;
+      }
+      
+      // Verificar padrão (regex)
+      const pattern = input.getAttribute('pattern');
+      if (pattern && value) {
+        const regex = new RegExp(pattern);
+        if (!regex.test(value)) {
+          isValid = false;
+          errorMsg = 'Formato inválido.';
+        }
+      }
+      
+      // Verificar email
+      if (input.type === 'email' && value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          isValid = false;
+          errorMsg = 'Digite um email válido.';
+        }
+      }
+      
+      // Verificar telefone
+      if (input.type === 'tel' && value) {
+        const phoneRegex = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
+        if (!phoneRegex.test(value)) {
+          isValid = false;
+          errorMsg = 'Digite um telefone válido.';
+        }
+      }
+      
+      // Aplicar validação
+      if (value) { // Só validar se há valor
+        if (isValid) {
+          input.classList.add('is-valid');
+          validFeedback.classList.remove('d-none');
+          invalidFeedback.classList.add('d-none');
+        } else {
+          input.classList.add('is-invalid');
+          validFeedback.classList.add('d-none');
+          invalidFeedback.classList.remove('d-none');
+          errorMessage.textContent = errorMsg;
+        }
+        validationFeedback.classList.remove('d-none');
+      }
+    }
+    
+    // Adicionar listeners
+    input.addEventListener('blur', validateField);
+    input.addEventListener('input', function() {
+      // Limpar validação durante a digitação
+      input.classList.remove('is-valid', 'is-invalid');
+      validationFeedback.classList.add('d-none');
+    });
+  }
+});
+</script>

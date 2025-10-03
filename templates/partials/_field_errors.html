@@ -1,0 +1,22 @@
+{% comment %}
+Template para exibir erros de campo individual.
+Uso: {% include 'partials/_field_errors.html' with field=form.field_name %}
+{% endcomment %}
+
+{% if field.errors %}
+  <div class="invalid-feedback d-block">
+    {% for error in field.errors %}
+      <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-triangle me-1"></i>
+        <span>{{ error }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if field.help_text %}
+  <div class="form-text">
+    <i class="fas fa-info-circle me-1"></i>
+    {{ field.help_text }}
+  </div>
+{% endif %}

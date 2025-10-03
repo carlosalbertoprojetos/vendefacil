@@ -1,0 +1,125 @@
+{% extends 'base/base.html' %}
+{% block title %}Meu Perfil - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">Meu Perfil</h4>
+        </div>
+        <div class="card-body">
+          {% include 'partials/_messages.html' %}
+          
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Nome</label>
+                  {{ user_form.first_name }}
+                  {% if user_form.first_name.errors %}
+                    <div class="text-danger small">
+                      {% for error in user_form.first_name.errors %}
+                        <div>{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Sobrenome</label>
+                  {{ user_form.last_name }}
+                  {% if user_form.last_name.errors %}
+                    <div class="text-danger small">
+                      {% for error in user_form.last_name.errors %}
+                        <div>{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="{{ user_form.email.id_for_label }}" class="form-label">E-mail</label>
+              {{ user_form.email }}
+              {% if user_form.email.errors %}
+                <div class="text-danger small">
+                  {% for error in user_form.email.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="mb-3">
+              <label for="{{ profile_form.phone.id_for_label }}" class="form-label">Telefone</label>
+              {{ profile_form.phone }}
+              {% if profile_form.phone.errors %}
+                <div class="text-danger small">
+                  {% for error in profile_form.phone.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="mb-3">
+              <label for="{{ profile_form.cpf.id_for_label }}" class="form-label">CPF</label>
+              {{ profile_form.cpf }}
+              {% if profile_form.cpf.errors %}
+                <div class="text-danger small">
+                  {% for error in profile_form.cpf.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="mb-3">
+              <label for="{{ profile_form.avatar.id_for_label }}" class="form-label">Avatar</label>
+              {{ profile_form.avatar }}
+              {% if profile_form.avatar.errors %}
+                <div class="text-danger small">
+                  {% for error in profile_form.avatar.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+              <a href="{% url 'authentication:change_password' %}" class="btn btn-outline-warning">Alterar Senha</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Informações da Conta</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Função:</strong> {{ user.get_role_display }}</p>
+          <p><strong>Status:</strong> 
+            {% if user.is_verified %}
+              <span class="badge bg-success">Verificado</span>
+            {% else %}
+              <span class="badge bg-warning">Pendente</span>
+            {% endif %}
+          </p>
+          <p><strong>Membro desde:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+          <p><strong>Último acesso:</strong> {{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

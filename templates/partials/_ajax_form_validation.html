@@ -1,0 +1,236 @@
+{% comment %}
+Template para exibir validação de formulário completo com AJAX.
+Uso: {% include 'partials/_ajax_form_validation.html' with form=form %}
+{% endcomment %}
+
+<div class="ajax-form-validation" data-form="{{ form.prefix|default:'form' }}">
+  {% if form.errors %}
+    <!-- Modal para erros de formulário AJAX -->
+    <div class="modal fade" id="ajaxFormErrorsModal" tabindex="-1" aria-labelledby="ajaxFormErrorsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="ajaxFormErrorsModalLabel">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              Erro na validação do formulário
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {% if form.non_field_errors %}
+              <div class="mb-3">
+                <h6 class="text-danger">
+                  <i class="fas fa-times-circle me-1"></i>
+                  Erros gerais:
+                </h6>
+                <ul class="mb-0">
+                  {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            
+            {% if form.errors %}
+              <div class="mb-0">
+                <h6 class="text-danger">
+                  <i class="fas fa-exclamation-triangle me-1"></i>
+                  Erros nos campos:
+                </h6>
+                <ul class="mb-0">
+                  {% for field, errors in form.errors.items %}
+                    {% if field != '__all__' %}
+                      <li>
+                        <strong>{{ field|title }}:</strong>
+                        {% for error in errors %}
+                          {{ error }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+              <i class="fas fa-times me-1"></i>
+              Fechar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+  
+  <!-- Modal para feedback de validação AJAX -->
+  <div class="modal fade" id="ajaxFormValidationModal" tabindex="-1" aria-labelledby="ajaxFormValidationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" id="ajaxFormValidationHeader">
+          <h5 class="modal-title" id="ajaxFormValidationModalLabel">
+            <i class="fas fa-info-circle me-2"></i>
+            Validação do formulário
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="ajaxFormValidationContent">
+            <!-- Conteúdo será inserido aqui via JavaScript -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+            <i class="fas fa-check me-1"></i>
+            Entendi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('[data-form="{{ form.prefix|default:'form' }}"]');
+  const formElement = form.querySelector('form');
+  const validationModal = new bootstrap.Modal(document.getElementById('ajaxFormValidationModal'));
+  const validationHeader = document.getElementById('ajaxFormValidationHeader');
+  const validationContent = document.getElementById('ajaxFormValidationContent');
+  const validationTitle = document.querySelector('#ajaxFormValidationModalLabel');
+  
+  if (formElement) {
+    // Função para validar formulário via AJAX
+    function validateFormViaAJAX() {
+      const formData = new FormData(formElement);
+      const data = {};
+      
+      for (let [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+      
+      // Mostrar loading
+      showValidationModal('info', 'Validando formulário...', 'fas fa-spinner fa-spin');
+      
+      // Fazer requisição AJAX
+      fetch('{% url "api:validate-form" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.valid) {
+          showValidationModal('success', data.message || 'Formulário válido', 'fas fa-check-circle');
+        } else {
+          let errorContent = data.message || 'Formulário inválido';
+          
+          // Mostrar erros específicos se disponíveis
+          if (data.errors) {
+            errorContent += '<ul class="mb-0 mt-2">';
+            Object.keys(data.errors).forEach(function(field) {
+              const fieldErrors = data.errors[field];
+              fieldErrors.forEach(function(error) {
+                errorContent += '<li><strong>' + field + ':</strong> ' + error + '</li>';
+              });
+            });
+            errorContent += '</ul>';
+          }
+          
+          showValidationModal('danger', errorContent, 'fas fa-exclamation-circle');
+        }
+      })
+      .catch(error => {
+        console.error('Erro na validação AJAX do formulário:', error);
+        showValidationModal('danger', 'Erro na validação do formulário', 'fas fa-exclamation-circle');
+      });
+    }
+    
+    // Função para mostrar modal de validação
+    function showValidationModal(type, message, icon) {
+      let alertClass = 'alert-info';
+      let headerClass = 'bg-info text-white';
+      
+      if (type === 'success') {
+        alertClass = 'alert-success';
+        headerClass = 'bg-success text-white';
+      } else if (type === 'danger') {
+        alertClass = 'alert-danger';
+        headerClass = 'bg-danger text-white';
+      } else if (type === 'warning') {
+        alertClass = 'alert-warning';
+        headerClass = 'bg-warning text-dark';
+      }
+      
+      // Atualizar header
+      validationHeader.className = `modal-header ${headerClass}`;
+      validationTitle.innerHTML = `<i class="${icon} me-2"></i>Validação do formulário`;
+      
+      // Atualizar conteúdo
+      validationContent.innerHTML = `
+        <div class="alert ${alertClass} mb-0">
+          <i class="${icon} me-2"></i>
+          ${message}
+        </div>
+      `;
+      
+      // Mostrar modal
+      validationModal.show();
+    }
+    
+    // Adicionar listeners
+    formElement.addEventListener('submit', function(event) {
+      event.preventDefault();
+      validateFormViaAJAX();
+    });
+    
+    // Validar ao sair de campos obrigatórios
+    const requiredInputs = formElement.querySelectorAll('input[required], select[required], textarea[required]');
+    requiredInputs.forEach(function(input) {
+      input.addEventListener('blur', function() {
+        // Validar apenas o campo específico
+        validateFieldViaAJAX(input);
+      });
+    });
+    
+    // Função para validar campo específico via AJAX
+    function validateFieldViaAJAX(input) {
+      const fieldName = input.name;
+      const value = input.value.trim();
+      
+      if (!value) {
+        return;
+      }
+      
+      // Fazer requisição AJAX para o campo específico
+      fetch('{% url "api:validate-field" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          field: fieldName,
+          value: value
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.valid) {
+          input.classList.add('is-valid');
+          input.classList.remove('is-invalid');
+        } else {
+          input.classList.add('is-invalid');
+          input.classList.remove('is-valid');
+        }
+      })
+      .catch(error => {
+        console.error('Erro na validação AJAX do campo:', error);
+      });
+    }
+  }
+});
+</script>

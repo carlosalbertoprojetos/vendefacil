@@ -1,0 +1,147 @@
+{% extends 'base/base.html' %}
+{% block title %}Pedido {{ pedido.numero }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'pedidos:list' %}">Pedidos</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Pedido {{ pedido.numero }}</li>
+    </ol>
+  </nav>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div>
+          <h1 class="h4 mb-1">Pedido {{ pedido.numero }}</h1>
+          <div class="text-muted small">Criado em {{ pedido.created_at|date:'d/m/Y H:i' }}</div>
+        </div>
+        <div>
+          <span class="badge bg-primary">{{ pedido.get_status_display }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">Itens do Pedido</div>
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Produto</th>
+                <th>Qtd</th>
+                <th class="text-end">Preço Unit.</th>
+                <th class="text-end">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in pedido.itens.all %}
+                <tr>
+                  <td>
+                    <div>
+                      <strong>{{ item.produto.nome }}</strong>
+                      {% if item.produto.sku %}
+                        <br><small class="text-muted">SKU: {{ item.produto.sku }}</small>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>{{ item.quantidade }}</td>
+                  <td class="text-end">R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                  <td class="text-end">R$ {{ item.preco_total|floatformat:2 }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">Nenhum item encontrado.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-header">Dados do Cliente</div>
+        <div class="card-body">
+          <div class="row small">
+            <div class="col-md-6"><strong>Nome:</strong> {{ pedido.cliente_nome|default:'—' }}</div>
+            <div class="col-md-6"><strong>Telefone:</strong> {{ pedido.cliente_telefone|default:'—' }}</div>
+            <div class="col-12 mt-2">
+              <strong>Endereço:</strong> 
+              {{ pedido.endereco_logradouro }}, {{ pedido.endereco_numero }}
+              {% if pedido.endereco_complemento %}- {{ pedido.endereco_complemento }}{% endif %}
+              <br>
+              {{ pedido.endereco_bairro }} - {{ pedido.endereco_cidade }}/{{ pedido.endereco_estado }}
+              <br>
+              CEP: {{ pedido.endereco_cep }}
+            </div>
+            {% if pedido.cliente_usuario %}
+              <div class="col-12 mt-2"><strong>E-mail:</strong> {{ pedido.cliente_usuario.email }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if pedido.observacoes %}
+      <div class="card mt-3">
+        <div class="card-header">Observações</div>
+        <div class="card-body">
+          <p class="mb-0">{{ pedido.observacoes }}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">Resumo do Pedido</div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-6">Subtotal</dt>
+            <dd class="col-6 text-end">R$ {{ pedido.subtotal|floatformat:2 }}</dd>
+            <dt class="col-6">Desconto</dt>
+            <dd class="col-6 text-end">R$ {{ pedido.desconto|floatformat:2 }}</dd>
+            <dt class="col-6">Frete</dt>
+            <dd class="col-6 text-end">R$ {{ pedido.frete|floatformat:2 }}</dd>
+            <hr>
+            <dt class="col-6 fw-bold">Total</dt>
+            <dd class="col-6 text-end fw-bold">R$ {{ pedido.total|floatformat:2 }}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-header">Informações do Pedido</div>
+        <div class="card-body">
+          <div class="small">
+            <p><strong>Número:</strong> {{ pedido.numero }}</p>
+            <p><strong>Status:</strong> {{ pedido.get_status_display }}</p>
+            <p><strong>Vendedor:</strong> {{ pedido.vendedor.get_full_name }}</p>
+            <p><strong>Criado em:</strong> {{ pedido.created_at|date:'d/m/Y H:i' }}</p>
+            <p><strong>Atualizado em:</strong> {{ pedido.updated_at|date:'d/m/Y H:i' }}</p>
+          </div>
+        </div>
+      </div>
+
+      {% if user.role == 'SUPER' or user.role == 'EMPRESA' %}
+      <div class="card mt-3">
+        <div class="card-header">Ações</div>
+        <div class="card-body">
+          <a href="{% url 'pedidos:status_update' pedido.pk %}" class="btn btn-primary btn-sm w-100 mb-2">
+            <i class="fas fa-edit"></i> Alterar Status
+          </a>
+          <a href="{% url 'pedidos:list' %}" class="btn btn-secondary btn-sm w-100">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,28 @@
+{% extends 'base/base.html' %}
+{% block title %}Notificações{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% with breadcrumbs=[('Dashboard','/dashboard/'),('Notificações',None)] %}
+    {% include 'partials/_breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+  {% endwith %}
+
+  <div class="list-group shadow-sm">
+    {% for n in object_list %}
+    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3 {% if not n.lida %}list-group-item-warning{% endif %}">
+      <div>
+        <div class="fw-semibold">{{ n.titulo }}</div>
+        <div class="small text-muted">{{ n.created_at|date:'d/m/Y H:i' }}</div>
+      </div>
+      <div class="ms-auto small text-muted">{{ n.get_tipo_display }}</div>
+    </a>
+    {% empty %}
+      <div class="list-group-item">Sem notificações.</div>
+    {% endfor %}
+  </div>
+
+  {% include 'partials/_pagination.html' %}
+</div>
+{% endblock %}
+
+

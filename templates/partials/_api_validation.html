@@ -1,0 +1,102 @@
+{% comment %}
+Template para exibir validação de API em tempo real.
+Uso: {% include 'partials/_api_validation.html' %}
+{% endcomment %}
+
+<!-- Modal para validação de API -->
+<div class="modal fade" id="apiValidationModal" tabindex="-1" aria-labelledby="apiValidationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="apiValidationModalLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Erro na validação
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul id="api-validation-errors" class="mb-0">
+          <!-- Erros serão inseridos aqui via JavaScript -->
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Função para exibir erros de validação da API
+  function showAPIValidationErrors(errors) {
+    const modal = new bootstrap.Modal(document.getElementById('apiValidationModal'));
+    const errorList = document.getElementById('api-validation-errors');
+    
+    if (errors && Object.keys(errors).length > 0) {
+      errorList.innerHTML = '';
+      
+      Object.keys(errors).forEach(function(field) {
+        const fieldErrors = errors[field];
+        fieldErrors.forEach(function(error) {
+          const li = document.createElement('li');
+          li.innerHTML = '<strong>' + field + ':</strong> ' + error;
+          errorList.appendChild(li);
+        });
+      });
+      
+      modal.show();
+    }
+  }
+  
+  // Função para limpar erros de validação da API
+  function clearAPIValidationErrors() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('apiValidationModal'));
+    if (modal) {
+      modal.hide();
+    }
+  }
+  
+  // Expor funções globalmente para uso em outros scripts
+  window.showAPIValidationErrors = showAPIValidationErrors;
+  window.clearAPIValidationErrors = clearAPIValidationErrors;
+  
+  // Função para validar campo via API
+  function validateFieldViaAPI(fieldName, value, endpoint) {
+    return fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify({
+        field: fieldName,
+        value: value
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.errors) {
+        showAPIValidationErrors(data.errors);
+        return false;
+      } else {
+        clearAPIValidationErrors();
+        return true;
+      }
+    })
+    .catch(error => {
+      console.error('Erro na validação da API:', error);
+      showAPIValidationErrors({
+        'sistema': ['Erro na comunicação com o servidor']
+      });
+      return false;
+    });
+  }
+  
+  // Expor função globalmente
+  window.validateFieldViaAPI = validateFieldViaAPI;
+});
+</script>

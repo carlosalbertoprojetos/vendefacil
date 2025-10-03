@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% block title %}Catálogo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-3">
+    {% for produto in produtos %}
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card h-100">
+        <img src="{{ produto.thumb_url|default:static('img/placeholder.png') }}" class="card-img-top" alt="{{ produto.nome }}">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title text-truncate">{{ produto.nome }}</h5>
+          <div class="mt-auto">
+            <div class="fw-bold mb-2">R$ {{ produto.preco_venda|floatformat:2 }}</div>
+            <form action="{% url 'carrinho:add' produto.id %}" method="post" onsubmit="return addToCartFormConfirm(this, event, '{{ produto.nome|escapejs }}')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary w-100">Adicionar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <div class="col-12"><div class="alert alert-light border">Nenhum produto disponível.</div></div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+// Função para confirmar adição ao carrinho via formulário com modal Bootstrap
+function addToCartFormConfirm(form, event, produtoNome) {
+    event.preventDefault();
+    
+    // Usar a função showConfirm do sistema de modais
+    if (typeof showConfirm === 'function') {
+        showConfirm(
+            `Deseja adicionar "${produtoNome}" ao carrinho?`,
+            'Adicionar ao Carrinho',
+            function() {
+                // Usuário confirmou, submeter o formulário
+                form.submit();
+            }
+        );
+    } else {
+        // Fallback para confirm nativo se o sistema de modais não estiver disponível
+        if (confirm('Adicionar ao carrinho?')) {
+            form.submit();
+        }
+    }
+    
+    return false; // Prevenir o comportamento padrão do formulário
+}
+</script>
+{% endblock %}
+
+

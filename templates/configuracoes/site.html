@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% block title %}Configurações do Site - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_messages.html' %}
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 m-0">Configurações do Site</h1>
+    <a href="{% url 'configuracoes:home' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Configurações Gerais</h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="site_name" class="form-label">Nome do Site</label>
+              <input type="text" class="form-control" id="site_name" name="site_name" value="VendaSimples">
+            </div>
+            <div class="mb-3">
+              <label for="site_description" class="form-label">Descrição do Site</label>
+              <textarea class="form-control" id="site_description" name="site_description" rows="3">Sistema de vendas online</textarea>
+            </div>
+            <div class="mb-3">
+              <label for="site_email" class="form-label">E-mail de Contato</label>
+              <input type="email" class="form-control" id="site_email" name="site_email" value="contato@vendefacil.com">
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Informações</h5>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">
+            Estas configurações afetam todo o sistema e são visíveis para todos os usuários.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

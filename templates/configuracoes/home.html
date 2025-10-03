@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+{% block title %}Configurações - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_messages.html' %}
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 m-0">Configurações</h1>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Configurações do Sistema</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            <a href="{% url 'configuracoes:site' %}" class="list-group-item list-group-item-action">
+              <i class="fas fa-cog me-2"></i>
+              Configurações do Site
+            </a>
+            <a href="{% url 'configuracoes:empresa' %}" class="list-group-item list-group-item-action">
+              <i class="fas fa-building me-2"></i>
+              Configurações da Empresa
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Informações do Sistema</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Versão:</strong> 1.0.0</p>
+          <p><strong>Status:</strong> <span class="badge bg-success">Operacional</span></p>
+          <p><strong>Última Atualização:</strong> {{ "now"|date:"d/m/Y H:i" }}</p>
+          <p><strong>Ambiente:</strong> Desenvolvimento</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

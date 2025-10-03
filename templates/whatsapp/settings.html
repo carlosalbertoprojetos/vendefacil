@@ -1,0 +1,30 @@
+{% extends 'base/base.html' %}
+{% block title %}WhatsApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% with breadcrumbs=[('Configurações','/configuracoes/'),('WhatsApp',None)] %}
+    {% include 'partials/_breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+  {% endwith %}
+
+  <div class="card">
+    <div class="card-header">Configurações do WhatsApp</div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Número com DDI</label>
+          <input name="phone" class="form-control" placeholder="55DDDNUMERO" value="{{ settings.whatsapp_phone }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Mensagem padrão</label>
+          <textarea name="template" class="form-control" rows="3">{{ settings.whatsapp_template }}</textarea>
+        </div>
+        <button class="btn btn-primary">Salvar</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

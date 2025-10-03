@@ -1,0 +1,150 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard Administrativo - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard Administrativo</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-cog"></i> Admin Django
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas Gerais -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Usuários
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_usuarios|default:0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total de Produtos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_produtos|default:0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total de Pedidos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_pedidos|default:0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Sistema Ativo
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <span class="badge bg-success">Online</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-server fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Ações Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog me-2"></i>
+                            Administração do Sistema
+                        </a>
+                        <a href="{% url 'produtos:list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-box me-2"></i>
+                            Gerenciar Produtos
+                        </a>
+                        <a href="{% url 'pedidos:list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Gerenciar Pedidos
+                        </a>
+                        <a href="{% url 'estatisticas:home' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Relatórios e Estatísticas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações do Sistema</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Versão:</strong> 1.0.0</p>
+                    <p class="mb-2"><strong>Status:</strong> <span class="badge bg-success">Operacional</span></p>
+                    <p class="mb-2"><strong>Última Atualização:</strong> {{ "now"|date:"d/m/Y H:i" }}</p>
+                    <p class="mb-0"><strong>Ambiente:</strong> Desenvolvimento</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

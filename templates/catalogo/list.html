@@ -1,0 +1,243 @@
+{% extends 'base/base.html' %}
+{% block title %}Catálogo - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_messages.html' %}
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 m-0">Catálogo de Produtos</h1>
+  </div>
+
+  <!-- Filtros e Ordenação -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <form method="get" class="row g-2">
+        <div class="col-md-4">
+          <select name="categoria" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">Todas as Categorias</option>
+            {% for categoria in categorias %}
+              <option value="{{ categoria.pk }}" {% if categoria.pk|stringformat:"s" == categoria_atual %}selected{% endif %}>
+                {{ categoria.nome }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <select name="ordenacao" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="nome" {% if ordenacao_atual == "nome" %}selected{% endif %}>Nome A-Z</option>
+            <option value="preco_menor" {% if ordenacao_atual == "preco_menor" %}selected{% endif %}>Menor Preço</option>
+            <option value="preco_maior" {% if ordenacao_atual == "preco_maior" %}selected{% endif %}>Maior Preço</option>
+            <option value="destaque" {% if ordenacao_atual == "destaque" %}selected{% endif %}>Em Destaque</option>
+          </select>
+        </div>
+        {% if categoria_atual %}
+          <div class="col-md-4">
+            <a href="{% url 'catalogo:list' %}" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-x-circle"></i> Limpar Filtros
+            </a>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+    <div class="col-md-4 text-end">
+      <small class="text-muted">
+        {% if object_list %}
+          Mostrando {{ object_list.start_index }} a {{ object_list.end_index }} de {{ object_list.paginator.count }} produtos
+        {% endif %}
+      </small>
+    </div>
+  </div>
+
+  {% if object_list %}
+  <div class="row g-4">
+    {% for produto in object_list %}
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm">
+          <!-- Imagem do produto -->
+          <div class="card-img-top" style="height: 200px; overflow: hidden;">
+            {% if produto.imagens.exists %}
+              {% with produto.imagens.first as primeira_imagem %}
+                <img src="{{ primeira_imagem.imagem.url }}" alt="{{ produto.nome }}" class="w-100 h-100 object-fit-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center" style="display: none;">
+                  <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                </div>
+              {% endwith %}
+            {% else %}
+              <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
+                <div class="text-center">
+                  <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                  <div class="small text-muted mt-2">Sem imagem</div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          
+          <div class="card-body d-flex flex-column">
+            <!-- Nome do produto -->
+            <h5 class="card-title text-truncate" title="{{ produto.nome }}">{{ produto.nome }}</h5>
+            
+            <!-- Categoria e Subcategoria -->
+            <div class="small text-muted mb-2">
+              {% if produto.categoria %}
+                <div>
+                  <i class="bi bi-tag"></i> 
+                  <strong>Categoria:</strong> {{ produto.categoria.nome }}
+                </div>
+              {% endif %}
+              {% if produto.subcategoria %}
+                <div>
+                  <i class="bi bi-collection"></i> 
+                  <strong>Subcategoria:</strong> {{ produto.subcategoria.nome }}
+                </div>
+              {% endif %}
+            </div>
+            
+            <!-- Descrição -->
+            {% if produto.descricao %}
+              <p class="card-text small text-secondary mb-2" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ produto.descricao|truncatewords:20 }}
+              </p>
+            {% endif %}
+            
+            <!-- Informações de estoque -->
+            <div class="small text-muted mb-2">
+              <i class="bi bi-box"></i> 
+              <strong>Estoque:</strong> 
+              {% if produto.estoque > 0 %}
+                <span class="text-success">{{ produto.estoque }} unidades</span>
+              {% else %}
+                <span class="text-danger">Indisponível</span>
+              {% endif %}
+            </div>
+            
+            <div class="mt-auto">
+              <!-- Preço -->
+              <div class="fw-bold text-primary mb-2">
+                <span class="fs-4">R$ {{ produto.preco|floatformat:2 }}</span>
+                {% if produto.preco_promocional and produto.em_promocao %}
+                  <div class="small text-decoration-line-through text-muted">
+                    R$ {{ produto.preco|floatformat:2 }}
+                  </div>
+                  <div class="small text-success">
+                    <i class="bi bi-percent"></i> Oferta: R$ {{ produto.preco_promocional|floatformat:2 }}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <!-- Badges informativos -->
+              <div class="mb-2">
+                {% if produto.em_promocao %}
+                  <span class="badge bg-danger">Promoção</span>
+                {% endif %}
+                {% if produto.em_destaque %}
+                  <span class="badge bg-warning text-dark">Destaque</span>
+                {% endif %}
+                {% if produto.lancamento %}
+                  <span class="badge bg-info">Novidade</span>
+                {% endif %}
+                {% if produto.mais_vendido %}
+                  <span class="badge bg-success">Mais Vendido</span>
+                {% endif %}
+              </div>
+              
+              <!-- Botões de ação -->
+              <div class="btn-group w-100">
+                <a href="{% url 'produtos:detail' produto.pk %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i> Ver Detalhes
+                </a>
+                {% if produto.estoque > 0 %}
+                  <form action="{% url 'carrinho:add' produto.pk %}" method="post" onsubmit="return addToCartFormConfirm(this, event, '{{ produto.nome|escapejs }}')" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-success">
+                      <i class="bi bi-cart-plus"></i> Comprar
+                    </button>
+                  </form>
+                {% else %}
+                  <button class="btn btn-sm btn-secondary" disabled>
+                    <i class="bi bi-x-circle"></i> Indisponível
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="alert alert-light border">
+      <i class="bi bi-info-circle"></i> 
+      Nenhum produto encontrado no catálogo.
+      {% if categoria_atual %}
+        <a href="{% url 'catalogo:list' %}" class="btn btn-link btn-sm">Ver todos os produtos</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Paginação -->
+  {% if object_list and object_list.has_other_pages %}
+    <nav aria-label="Navegação de páginas" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if object_list.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if categoria_atual %}categoria={{ categoria_atual }}&{% endif %}{% if ordenacao_atual %}ordenacao={{ ordenacao_atual }}&{% endif %}page=1">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?{% if categoria_atual %}categoria={{ categoria_atual }}&{% endif %}{% if ordenacao_atual %}ordenacao={{ ordenacao_atual }}&{% endif %}page={{ object_list.previous_page_number }}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        <li class="page-item active">
+          <span class="page-link">
+            Página {{ object_list.number }} de {{ object_list.paginator.num_pages }}
+          </span>
+        </li>
+
+        {% if object_list.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if categoria_atual %}categoria={{ categoria_atual }}&{% endif %}{% if ordenacao_atual %}ordenacao={{ ordenacao_atual }}&{% endif %}page={{ object_list.next_page_number }}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?{% if categoria_atual %}categoria={{ categoria_atual }}&{% endif %}{% if ordenacao_atual %}ordenacao={{ ordenacao_atual }}&{% endif %}page={{ object_list.paginator.num_pages }}">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+
+<script>
+// Função para confirmar adição ao carrinho via formulário com modal Bootstrap
+function addToCartFormConfirm(form, event, produtoNome) {
+    event.preventDefault();
+    
+    // Usar a função showConfirm do sistema de modais
+    if (typeof showConfirm === 'function') {
+        showConfirm(
+            `Deseja adicionar "${produtoNome}" ao carrinho?`,
+            'Adicionar ao Carrinho',
+            function() {
+                // Usuário confirmou, submeter o formulário
+                form.submit();
+            }
+        );
+    } else {
+        // Fallback para confirm nativo se o sistema de modais não estiver disponível
+        if (confirm('Adicionar ao carrinho?')) {
+            form.submit();
+        }
+    }
+    
+    return false; // Prevenir o comportamento padrão do formulário
+}
+</script>
+{% endblock %}

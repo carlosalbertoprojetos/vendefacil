@@ -1,0 +1,70 @@
+{% comment %}
+Template para exibir erros de formulário de forma consistente.
+Uso: {% include 'partials/_form_errors.html' with form=form %}
+{% endcomment %}
+
+{% if form.errors %}
+<!-- Modal para erros de formulário -->
+<div class="modal fade" id="formErrorsModal" tabindex="-1" aria-labelledby="formErrorsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="formErrorsModalLabel">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          Erro na validação do formulário
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% if form.non_field_errors %}
+          <div class="mb-3">
+            <h6 class="text-danger">
+              <i class="fas fa-times-circle me-1"></i>
+              Erros gerais:
+            </h6>
+            <ul class="mb-0">
+              {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+        
+        {% if form.errors %}
+          <div class="mb-0">
+            <h6 class="text-danger">
+              <i class="fas fa-exclamation-triangle me-1"></i>
+              Erros nos campos:
+            </h6>
+            <ul class="mb-0">
+              {% for field, errors in form.errors.items %}
+                {% if field != '__all__' %}
+                  <li>
+                    <strong>{{ field|title }}:</strong>
+                    {% for error in errors %}
+                      {{ error }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = new bootstrap.Modal(document.getElementById('formErrorsModal'));
+  modal.show();
+});
+</script>
+{% endif %}

@@ -1,0 +1,94 @@
+{% if messages %}
+<!-- Modal para mensagens -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="messageModalLabel">
+          <i class="fas fa-info-circle me-2"></i>
+          Notificação
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="messageContent">
+          <!-- Conteúdo da mensagem será inserido aqui via JavaScript -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const messages = [
+    {% for message in messages %}
+    {
+      text: "{{ message|escapejs }}",
+      type: "{{ message.tags|default:'info' }}",
+      icon: "{% if message.tags == 'error' or message.tags == 'danger' %}fas fa-exclamation-circle{% elif message.tags == 'success' %}fas fa-check-circle{% elif message.tags == 'warning' %}fas fa-exclamation-triangle{% else %}fas fa-info-circle{% endif %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  if (messages.length > 0) {
+    let currentMessageIndex = 0;
+    const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+    const messageContent = document.getElementById('messageContent');
+    const modalTitle = document.querySelector('#messageModalLabel');
+    const modalHeader = document.querySelector('.modal-header');
+
+    function showMessage(index) {
+      const message = messages[index];
+      
+      // Definir ícone e cor baseado no tipo
+      let alertClass = 'alert-info';
+      if (message.type === 'error' || message.type === 'danger') {
+        alertClass = 'alert-danger';
+      } else if (message.type === 'success') {
+        alertClass = 'alert-success';
+      } else if (message.type === 'warning') {
+        alertClass = 'alert-warning';
+      }
+
+      // Atualizar título e ícone
+      modalTitle.innerHTML = `<i class="${message.icon} me-2"></i>Notificação`;
+      
+      // Atualizar conteúdo
+      messageContent.innerHTML = `
+        <div class="alert ${alertClass} mb-0">
+          <div class="d-flex align-items-center">
+            <i class="${message.icon} me-2"></i>
+            <div class="flex-grow-1">
+              ${message.text}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Atualizar cor do header
+      modalHeader.className = `modal-header ${alertClass.replace('alert-', 'bg-')} text-white`;
+
+      // Mostrar modal
+      modal.show();
+    }
+
+    // Mostrar primeira mensagem
+    showMessage(0);
+
+    // Event listener para próxima mensagem
+    document.getElementById('messageModal').addEventListener('hidden.bs.modal', function() {
+      currentMessageIndex++;
+      if (currentMessageIndex < messages.length) {
+        setTimeout(() => showMessage(currentMessageIndex), 300);
+      }
+    });
+  }
+});
+</script>
+{% endif %}
+
+

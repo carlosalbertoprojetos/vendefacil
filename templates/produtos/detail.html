@@ -1,0 +1,92 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ object.nome }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_breadcrumbs.html' %}
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="ratio ratio-1x1 bg-light rounded overflow-hidden">
+        {% if object.imagens.exists %}
+          {% with object.imagens.first as primeira_imagem %}
+            <img src="{{ primeira_imagem.imagem.url }}" alt="{{ object.nome }}" class="w-100 h-100 object-fit-cover">
+          {% endwith %}
+        {% else %}
+          <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <div class="text-center">
+              <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+              <div class="text-muted mt-2">Sem imagem</div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      {% if object.imagens.count > 1 %}
+      <div class="d-flex gap-2 mt-2">
+        {% for img in object.imagens.all|slice:':5' %}
+          <img src="{{ img.imagem.url }}" class="rounded" alt="{{ img.alt_text|default:object.nome }}" style="width:64px;height:64px;object-fit:cover;" onclick="document.querySelector('.ratio img').src='{{ img.imagem.url }}'">
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <h1 class="h3">{{ object.nome }}</h1>
+      <p class="text-muted">{% if object.categoria %}{{ object.categoria.nome }}{% endif %}</p>
+      <div class="display-6 fw-bold mb-3">R$ {{ object.preco|floatformat:2 }}</div>
+
+      <dl class="row small">
+        <dt class="col-sm-4">SKU</dt><dd class="col-sm-8">{{ object.sku|default:'—' }}</dd>
+        <dt class="col-sm-4">Marca</dt><dd class="col-sm-8">{{ object.marca|default:'—' }}</dd>
+        <dt class="col-sm-4">Estoque</dt><dd class="col-sm-8">{{ object.estoque|default:'—' }}</dd>
+      </dl>
+
+      <div class="d-flex gap-2 mt-3">
+        <form action="{% url 'carrinho:add' object.pk %}" method="post" onsubmit="return addToCartFormConfirm(this, event)">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary"><i class="bi bi-cart-plus"></i> Adicionar ao carrinho</button>
+        </form>
+        <a href="{% url 'produtos:edit' object.pk %}" class="btn btn-outline-secondary">Editar</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h2 class="h5">Descrição</h2>
+    <div class="card">
+      <div class="card-body">
+        {{ object.descricao|linebreaks|default:'Sem descrição.' }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Função para confirmar adição ao carrinho via formulário com modal Bootstrap
+function addToCartFormConfirm(form, event) {
+    event.preventDefault();
+    
+    const produtoNome = "{{ object.nome|escapejs }}";
+    
+    // Usar a função showConfirm do sistema de modais
+    if (typeof showConfirm === 'function') {
+        showConfirm(
+            `Deseja adicionar "${produtoNome}" ao carrinho?`,
+            'Adicionar ao Carrinho',
+            function() {
+                // Usuário confirmou, submeter o formulário
+                form.submit();
+            }
+        );
+    } else {
+        // Fallback para confirm nativo se o sistema de modais não estiver disponível
+        if (confirm('Adicionar ao carrinho?')) {
+            form.submit();
+        }
+    }
+    
+    return false; // Prevenir o comportamento padrão do formulário
+}
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,178 @@
+{% extends 'base/base.html' %}
+{% block title %}Alterar Status - Pedido {{ pedido.numero }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'pedidos:list' %}">Pedidos</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'pedidos:detail' pedido.pk %}">Pedido {{ pedido.numero }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Alterar Status</li>
+    </ol>
+  </nav>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">Alterar Status do Pedido</h4>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6>Informações do Pedido</h6>
+              <p class="mb-1"><strong>Número:</strong> {{ pedido.numero }}</p>
+              <p class="mb-1"><strong>Cliente:</strong> {{ pedido.cliente_nome }}</p>
+              <p class="mb-1"><strong>Total:</strong> R$ {{ pedido.total|floatformat:2 }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6>Status Atual</h6>
+              <span class="badge bg-primary fs-6">{{ pedido.get_status_display }}</span>
+            </div>
+          </div>
+
+          <form method="post" id="statusForm">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="status" class="form-label">Novo Status</label>
+              <select class="form-select" id="status" name="status" required>
+                <option value="">Selecione o novo status</option>
+                {% for value, label in status_choices %}
+                  <option value="{{ value }}" {% if value == pedido.status %}selected{% endif %}>
+                    {{ label }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="observacoes" class="form-label">Observações (opcional)</label>
+              <textarea 
+                class="form-control" 
+                id="observacoes" 
+                name="observacoes" 
+                rows="3" 
+                placeholder="Adicione observações sobre a mudança de status..."
+              ></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary" onclick="return confirmarAlteracao()">
+                <i class="fas fa-save"></i> Atualizar Status
+              </button>
+              <a href="{% url 'pedidos:detail' pedido.pk %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Histórico de Status -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5 class="mb-0">Histórico de Status</h5>
+        </div>
+        <div class="card-body">
+          {% if pedido.historico_status.all %}
+            <div class="timeline">
+              {% for historico in pedido.historico_status.all %}
+                <div class="timeline-item">
+                  <div class="timeline-marker"></div>
+                  <div class="timeline-content">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <h6 class="mb-1">
+                          <span class="badge bg-secondary">{{ historico.status_anterior }}</span>
+                          <i class="fas fa-arrow-right mx-2"></i>
+                          <span class="badge bg-primary">{{ historico.status_novo }}</span>
+                        </h6>
+                        <p class="mb-1 text-muted small">
+                          <i class="fas fa-user"></i> {{ historico.usuario.get_full_name|default:"Sistema" }}
+                          <i class="fas fa-clock ms-2"></i> {{ historico.created_at|date:"d/m/Y H:i" }}
+                        </p>
+                        {% if historico.observacoes %}
+                          <p class="mb-0 small">{{ historico.observacoes }}</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted text-center py-3">Nenhum histórico de alterações encontrado.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -30px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  background-color: #007bff;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px #007bff;
+}
+
+.timeline-content {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid #007bff;
+}
+
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 17px;
+  width: 2px;
+  height: calc(100% + 20px);
+  background-color: #dee2e6;
+}
+</style>
+
+<script>
+function confirmarAlteracao() {
+  const statusAtual = '{{ pedido.status }}';
+  const novoStatus = document.getElementById('status').value;
+  
+  if (!novoStatus) {
+    showError('Por favor, selecione um novo status.');
+    return false;
+  }
+  
+  if (statusAtual === novoStatus) {
+    showWarning('O status selecionado é o mesmo do atual. Deseja continuar?');
+  }
+  
+  return showConfirm(
+    'Alterar Status do Pedido',
+    `Tem certeza que deseja alterar o status do pedido ${novoStatus}?`,
+    function() {
+      document.getElementById('statusForm').submit();
+    }
+  );
+}
+</script>
+{% endblock %}

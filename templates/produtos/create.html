@@ -1,0 +1,341 @@
+{% extends 'base/base.html' %}
+{% block title %}Novo Produto - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_messages.html' %}
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 m-0">Novo Produto</h1>
+    <a href="{% url 'produtos:list' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Informações do Produto</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Exibir erros gerais do formulário -->
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                <h6 class="alert-heading">Erros no formulário:</h6>
+                <ul class="mb-0">
+                  {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            
+            <div class="row">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label for="{{ form.nome.id_for_label }}" class="form-label">Nome do Produto *</label>
+                  {{ form.nome }}
+                  {% if form.nome.errors %}
+                    <div class="invalid-feedback d-block">
+                      {% for error in form.nome.errors %}
+                        <div class="text-danger small">
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">Nome único do produto (mínimo 3 caracteres)</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="{{ form.sku.id_for_label }}" class="form-label">SKU</label>
+                  {{ form.sku }}
+                  {% if form.sku.errors %}
+                    <div class="invalid-feedback d-block">
+                      {% for error in form.sku.errors %}
+                        <div class="text-danger small">
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">Código único do produto (opcional)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição</label>
+              {{ form.descricao }}
+              {% if form.descricao.errors %}
+                <div class="text-danger small">
+                  {% for error in form.descricao.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.categoria.id_for_label }}" class="form-label">Categoria</label>
+                  {{ form.categoria }}
+                  {% if form.categoria.errors %}
+                    <div class="text-danger small">
+                      {% for error in form.categoria.errors %}
+                        <div>{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.subcategoria.id_for_label }}" class="form-label">Subcategoria</label>
+                  {{ form.subcategoria }}
+                  {% if form.subcategoria.errors %}
+                    <div class="text-danger small">
+                      {% for error in form.subcategoria.errors %}
+                        <div>{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.marca.id_for_label }}" class="form-label">Marca</label>
+                  {{ form.marca }}
+                  {% if form.marca.errors %}
+                    <div class="invalid-feedback d-block">
+                      {% for error in form.marca.errors %}
+                        <div class="text-danger small">
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">Marca do produto (opcional)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="{{ form.preco.id_for_label }}" class="form-label">Preço *</label>
+                  <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    {{ form.preco }}
+                  </div>
+                  {% if form.preco.errors %}
+                    <div class="invalid-feedback d-block">
+                      {% for error in form.preco.errors %}
+                        <div class="text-danger small">
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">Preço de venda do produto (obrigatório)</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="{{ form.preco_promocional.id_for_label }}" class="form-label">Preço Promocional</label>
+                  <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    {{ form.preco_promocional }}
+                  </div>
+                  {% if form.preco_promocional.errors %}
+                    <div class="invalid-feedback d-block">
+                      {% for error in form.preco_promocional.errors %}
+                        <div class="text-danger small">
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">Deve ser menor que o preço normal</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="{{ form.estoque.id_for_label }}" class="form-label">Estoque</label>
+                  {{ form.estoque }}
+                  {% if form.estoque.errors %}
+                    <div class="text-danger small">
+                      {% for error in form.estoque.errors %}
+                        <div>{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.imagem_principal.id_for_label }}" class="form-label">Imagem Principal</label>
+                  {{ form.imagem_principal }}
+                  {% if form.imagem_principal.errors %}
+                    <div class="text-danger small">
+                      {% for error in form.imagem_principal.errors %}
+                        <div>{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">
+                    <i class="bi bi-info-circle"></i> Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 5MB
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Preview da Imagem</label>
+                  <div class="border rounded p-3 bg-light text-center" id="image-preview">
+                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    <div class="text-muted mt-2">Nenhuma imagem selecionada</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <div class="form-check">
+                    {{ form.disponivel }}
+                    <label class="form-check-label" for="{{ form.disponivel.id_for_label }}">
+                      Produto disponível para venda
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Salvar Produto</button>
+              <a href="{% url 'produtos:list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Dicas</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled small">
+            <li><i class="fas fa-info-circle text-primary me-2"></i> Preencha pelo menos o nome e preço</li>
+            <li><i class="fas fa-image text-primary me-2"></i> Adicione uma imagem principal atrativa</li>
+            <li><i class="fas fa-tag text-primary me-2"></i> Use SKU único para controle de estoque</li>
+            <li><i class="fas fa-ruler text-primary me-2"></i> Dimensões ajudam no cálculo de frete</li>
+            <li><i class="fas fa-barcode text-primary me-2"></i> Código de barras facilita vendas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadSubcategorias() {
+    const categoriaSelect = document.getElementById('id_categoria');
+    const subcategoriaSelect = document.getElementById('id_subcategoria');
+    
+    // Limpar opções existentes
+    subcategoriaSelect.innerHTML = '<option value="">Selecione uma subcategoria</option>';
+    
+    if (!categoriaSelect.value) {
+        subcategoriaSelect.disabled = true;
+        return Promise.resolve();
+    }
+    
+    // Mostrar loading
+    subcategoriaSelect.innerHTML = '<option value="">Carregando...</option>';
+    subcategoriaSelect.disabled = true;
+    
+    // Fazer requisição AJAX
+    return fetch(`{% url 'produtos:get_subcategorias' %}?categoria_id=${categoriaSelect.value}`)
+        .then(response => response.json())
+        .then(data => {
+            subcategoriaSelect.innerHTML = '<option value="">Selecione uma subcategoria</option>';
+            
+            if (data.subcategorias.length > 0) {
+                data.subcategorias.forEach(subcategoria => {
+                    const option = document.createElement('option');
+                    option.value = subcategoria.id;
+                    option.textContent = subcategoria.nome;
+                    subcategoriaSelect.appendChild(option);
+                });
+                subcategoriaSelect.disabled = false;
+            } else {
+                subcategoriaSelect.innerHTML = '<option value="">Nenhuma subcategoria encontrada</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar subcategorias:', error);
+            subcategoriaSelect.innerHTML = '<option value="">Erro ao carregar subcategorias</option>';
+        });
+}
+
+// Inicializar quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    const categoriaSelect = document.getElementById('id_categoria');
+    const subcategoriaSelect = document.getElementById('id_subcategoria');
+    
+    // Se já houver uma categoria selecionada, carregar subcategorias
+    if (categoriaSelect.value) {
+        loadSubcategorias();
+    }
+    
+    // Adicionar event listener para mudanças na categoria
+    categoriaSelect.addEventListener('change', loadSubcategorias);
+    
+    // Preview de imagem
+    const imageInput = document.getElementById('id_imagem_principal');
+    const imagePreview = document.getElementById('image-preview');
+    
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                        <div class="small text-muted mt-2">
+                            <i class="bi bi-check-circle text-success"></i> 
+                            Imagem selecionada: ${file.name}
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.innerHTML = `
+                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    <div class="text-muted mt-2">Nenhuma imagem selecionada</div>
+                `;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

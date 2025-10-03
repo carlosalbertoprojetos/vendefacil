@@ -1,0 +1,148 @@
+{% comment %}
+Template para exibir validação de campos em tempo real com AJAX.
+Uso: {% include 'partials/_ajax_validation.html' with field=form.field_name %}
+{% endcomment %}
+
+<div class="ajax-validation" data-field="{{ field.name }}">
+  {% if field.errors %}
+    <div class="invalid-feedback d-block">
+      {% for error in field.errors %}
+        <div class="d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle me-1"></i>
+          <span>{{ error }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  
+  {% if field.help_text %}
+    <div class="form-text">
+      <i class="fas fa-info-circle me-1"></i>
+      {{ field.help_text }}
+    </div>
+  {% endif %}
+  
+  <div class="ajax-validation-feedback d-none">
+    <div class="valid-feedback">
+      <i class="fas fa-check-circle me-1"></i>
+      <span class="valid-message">Campo válido</span>
+    </div>
+    <div class="invalid-feedback">
+      <i class="fas fa-exclamation-triangle me-1"></i>
+      <span class="error-message"></span>
+    </div>
+    <div class="loading-feedback">
+      <i class="fas fa-spinner fa-spin me-1"></i>
+      <span>Validando...</span>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const field = document.querySelector('[data-field="{{ field.name }}"]');
+  const input = field.querySelector('input, select, textarea');
+  const validationFeedback = field.querySelector('.ajax-validation-feedback');
+  const validFeedback = validationFeedback.querySelector('.valid-feedback');
+  const invalidFeedback = validationFeedback.querySelector('.invalid-feedback');
+  const loadingFeedback = validationFeedback.querySelector('.loading-feedback');
+  const errorMessage = invalidFeedback.querySelector('.error-message');
+  const validMessage = validFeedback.querySelector('.valid-message');
+  
+  if (input && validationFeedback) {
+    let validationTimeout;
+    
+    // Função para validar campo via AJAX
+    function validateFieldViaAJAX() {
+      const value = input.value.trim();
+      const fieldName = input.name;
+      
+      // Limpar validação anterior
+      input.classList.remove('is-valid', 'is-invalid');
+      validationFeedback.classList.add('d-none');
+      validFeedback.classList.add('d-none');
+      invalidFeedback.classList.add('d-none');
+      loadingFeedback.classList.add('d-none');
+      
+      if (!value) {
+        return;
+      }
+      
+      // Mostrar loading
+      validationFeedback.classList.remove('d-none');
+      loadingFeedback.classList.remove('d-none');
+      
+      // Fazer requisição AJAX
+      fetch('{% url "api:validate-field" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          field: fieldName,
+          value: value
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Esconder loading
+        loadingFeedback.classList.add('d-none');
+        
+        if (data.valid) {
+          input.classList.add('is-valid');
+          validFeedback.classList.remove('d-none');
+          invalidFeedback.classList.add('d-none');
+          validMessage.textContent = data.message || 'Campo válido';
+        } else {
+          input.classList.add('is-invalid');
+          validFeedback.classList.add('d-none');
+          invalidFeedback.classList.remove('d-none');
+          errorMessage.textContent = data.message || 'Campo inválido';
+        }
+        
+        validationFeedback.classList.remove('d-none');
+      })
+      .catch(error => {
+        console.error('Erro na validação AJAX:', error);
+        
+        // Esconder loading
+        loadingFeedback.classList.add('d-none');
+        
+        // Mostrar erro
+        input.classList.add('is-invalid');
+        validFeedback.classList.add('d-none');
+        invalidFeedback.classList.remove('d-none');
+        errorMessage.textContent = 'Erro na validação';
+        
+        validationFeedback.classList.remove('d-none');
+      });
+    }
+    
+    // Adicionar listeners
+    input.addEventListener('input', function() {
+      // Limpar validação durante a digitação
+      input.classList.remove('is-valid', 'is-invalid');
+      validationFeedback.classList.add('d-none');
+      
+      // Limpar timeout anterior
+      if (validationTimeout) {
+        clearTimeout(validationTimeout);
+      }
+      
+      // Validar após 500ms de inatividade
+      validationTimeout = setTimeout(validateFieldViaAJAX, 500);
+    });
+    
+    input.addEventListener('blur', function() {
+      // Limpar timeout anterior
+      if (validationTimeout) {
+        clearTimeout(validationTimeout);
+      }
+      
+      // Validar imediatamente
+      validateFieldViaAJAX();
+    });
+  }
+});
+</script>

@@ -1,0 +1,75 @@
+{% comment %}
+Template para exibir erros de validação em tempo real.
+Uso: {% include 'partials/_validation_errors.html' %}
+{% endcomment %}
+
+<!-- Modal para erros de validação -->
+<div class="modal fade" id="validationErrorsModal" tabindex="-1" aria-labelledby="validationErrorsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="validationErrorsModalLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Erros de validação
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul id="validation-errors-list" class="mb-0">
+          <!-- Erros serão inseridos aqui via JavaScript -->
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Função para exibir erros de validação
+  function showValidationErrors(errors) {
+    const modal = new bootstrap.Modal(document.getElementById('validationErrorsModal'));
+    const errorList = document.getElementById('validation-errors-list');
+    
+    if (errors && Object.keys(errors).length > 0) {
+      errorList.innerHTML = '';
+      
+      Object.keys(errors).forEach(function(field) {
+        const fieldErrors = errors[field];
+        fieldErrors.forEach(function(error) {
+          const li = document.createElement('li');
+          li.innerHTML = '<strong>' + field + ':</strong> ' + error;
+          errorList.appendChild(li);
+        });
+      });
+      
+      modal.show();
+    }
+  }
+  
+  // Função para limpar erros de validação
+  function clearValidationErrors() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('validationErrorsModal'));
+    if (modal) {
+      modal.hide();
+    }
+  }
+  
+  // Expor funções globalmente para uso em outros scripts
+  window.showValidationErrors = showValidationErrors;
+  window.clearValidationErrors = clearValidationErrors;
+  
+  // Limpar erros quando o formulário for submetido
+  const forms = document.querySelectorAll('form');
+  forms.forEach(function(form) {
+    form.addEventListener('submit', function() {
+      clearValidationErrors();
+    });
+  });
+});
+</script>

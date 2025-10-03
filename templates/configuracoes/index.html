@@ -1,0 +1,39 @@
+{% extends 'base/base.html' %}
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% with breadcrumbs=[('Dashboard','/dashboard/'),('Configurações',None)] %}
+    {% include 'partials/_breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+  {% endwith %}
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">Dados da Empresa</div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3"><label class="form-label">Nome</label><input name="nome" class="form-control" value="{{ empresa.nome }}"></div>
+            <div class="mb-3"><label class="form-label">Logo</label><input type="file" name="logo" class="form-control"></div>
+            <button class="btn btn-primary">Salvar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">Tema</div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col"><label class="form-label">Primária</label><input type="color" name="cor_primaria" value="{{ empresa.cor_primaria|default:'#0d6efd' }}" class="form-control form-control-color"></div>
+            <div class="col"><label class="form-label">Secundária</label><input type="color" name="cor_secundaria" value="{{ empresa.cor_secundaria|default:'#6c757d' }}" class="form-control form-control-color"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

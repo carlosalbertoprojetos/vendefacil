@@ -1,0 +1,76 @@
+{% comment %}
+Template para exibir erros de JavaScript.
+Uso: {% include 'partials/_js_errors.html' %}
+{% endcomment %}
+
+<!-- Modal para erros de JavaScript -->
+<div class="modal fade" id="jsErrorsModal" tabindex="-1" aria-labelledby="jsErrorsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="jsErrorsModalLabel">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          Erro no sistema
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger mb-0">
+          <i class="fas fa-times-circle me-2"></i>
+          <span id="js-error-message">
+            <!-- Mensagem de erro será inserida aqui via JavaScript -->
+          </span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>
+          Fechar
+        </button>
+        <button type="button" class="btn btn-outline-light" onclick="location.reload()">
+          <i class="fas fa-refresh me-1"></i>
+          Recarregar página
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Função para exibir erros de JavaScript
+  function showJSError(message) {
+    const modal = new bootstrap.Modal(document.getElementById('jsErrorsModal'));
+    const errorMessage = document.getElementById('js-error-message');
+    
+    if (message) {
+      errorMessage.textContent = message;
+      modal.show();
+    }
+  }
+  
+  // Função para limpar erros de JavaScript
+  function clearJSErrors() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('jsErrorsModal'));
+    if (modal) {
+      modal.hide();
+    }
+  }
+  
+  // Expor funções globalmente para uso em outros scripts
+  window.showJSError = showJSError;
+  window.clearJSErrors = clearJSErrors;
+  
+  // Capturar erros não tratados
+  window.addEventListener('error', function(event) {
+    console.error('Erro JavaScript:', event.error);
+    showJSError('Ocorreu um erro inesperado. Por favor, recarregue a página e tente novamente.');
+  });
+  
+  // Capturar promessas rejeitadas não tratadas
+  window.addEventListener('unhandledrejection', function(event) {
+    console.error('Promessa rejeitada:', event.reason);
+    showJSError('Ocorreu um erro na comunicação com o servidor. Por favor, tente novamente.');
+  });
+});
+</script>

@@ -1,0 +1,257 @@
+{% extends 'base/base.html' %}
+{% block title %}Editar Pedido - {{ pedido.numero }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'pedidos:list' %}">Pedidos</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'pedidos:detail' pedido.pk %}">Pedido {{ pedido.numero }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Editar</li>
+    </ol>
+  </nav>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">Editar Pedido {{ pedido.numero }}</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" id="editForm">
+            {% csrf_token %}
+            
+            <!-- Dados do Cliente -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="text-primary mb-3">
+                  <i class="fas fa-user"></i> Dados do Cliente
+                </h5>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="cliente_nome" class="form-label">Nome *</label>
+                  <input type="text" class="form-control" id="cliente_nome" name="cliente_nome" 
+                         value="{{ pedido.cliente_nome }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="cliente_telefone" class="form-label">Telefone *</label>
+                  <input type="text" class="form-control" id="cliente_telefone" name="cliente_telefone" 
+                         value="{{ pedido.cliente_telefone }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="cliente_email" class="form-label">E-mail</label>
+                  <input type="email" class="form-control" id="cliente_email" name="cliente_email" 
+                         value="{{ pedido.cliente_email }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="cliente_cpf" class="form-label">CPF</label>
+                  <input type="text" class="form-control" id="cliente_cpf" name="cliente_cpf" 
+                         value="{{ pedido.cliente_cpf }}">
+                </div>
+              </div>
+            </div>
+
+            <!-- Endereço de Entrega -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="text-primary mb-3">
+                  <i class="fas fa-map-marker-alt"></i> Endereço de Entrega
+                </h5>
+              </div>
+              <div class="col-md-3">
+                <div class="mb-3">
+                  <label for="endereco_cep" class="form-label">CEP *</label>
+                  <input type="text" class="form-control" id="endereco_cep" name="endereco_cep" 
+                         value="{{ pedido.endereco_cep }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="endereco_logradouro" class="form-label">Logradouro *</label>
+                  <input type="text" class="form-control" id="endereco_logradouro" name="endereco_logradouro" 
+                         value="{{ pedido.endereco_logradouro }}" required>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="mb-3">
+                  <label for="endereco_numero" class="form-label">Número *</label>
+                  <input type="text" class="form-control" id="endereco_numero" name="endereco_numero" 
+                         value="{{ pedido.endereco_numero }}" required>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="endereco_complemento" class="form-label">Complemento</label>
+                  <input type="text" class="form-control" id="endereco_complemento" name="endereco_complemento" 
+                         value="{{ pedido.endereco_complemento }}">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="endereco_bairro" class="form-label">Bairro *</label>
+                  <input type="text" class="form-control" id="endereco_bairro" name="endereco_bairro" 
+                         value="{{ pedido.endereco_bairro }}" required>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="mb-3">
+                  <label for="endereco_cidade" class="form-label">Cidade *</label>
+                  <input type="text" class="form-control" id="endereco_cidade" name="endereco_cidade" 
+                         value="{{ pedido.endereco_cidade }}" required>
+                </div>
+              </div>
+              <div class="col-md-1">
+                <div class="mb-3">
+                  <label for="endereco_estado" class="form-label">UF *</label>
+                  <input type="text" class="form-control" id="endereco_estado" name="endereco_estado" 
+                         value="{{ pedido.endereco_estado }}" maxlength="2" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="text-primary mb-3">
+                  <i class="fas fa-info-circle"></i> Informações Adicionais
+                </h5>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="data_entrega_prevista" class="form-label">Data de Entrega Prevista</label>
+                  <input type="datetime-local" class="form-control" id="data_entrega_prevista" 
+                         name="data_entrega_prevista" 
+                         value="{% if pedido.data_entrega_prevista %}{{ pedido.data_entrega_prevista|date:'Y-m-d\TH:i' }}{% endif %}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Status Atual</label>
+                  <div class="form-control-plaintext">
+                    <span class="badge bg-primary">{{ pedido.get_status_display }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="observacoes" class="form-label">Observações</label>
+                  <textarea class="form-control" id="observacoes" name="observacoes" rows="3" 
+                            placeholder="Observações sobre o pedido...">{{ pedido.observacoes }}</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resumo do Pedido -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="text-primary mb-3">
+                  <i class="fas fa-calculator"></i> Resumo Financeiro
+                </h5>
+              </div>
+              <div class="col-md-3">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Subtotal</h6>
+                    <h5 class="text-primary">R$ {{ pedido.subtotal|floatformat:2 }}</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Desconto</h6>
+                    <h5 class="text-warning">R$ {{ pedido.desconto|floatformat:2 }}</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Frete</h6>
+                    <h5 class="text-info">R$ {{ pedido.frete|floatformat:2 }}</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card bg-success text-white">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Total</h6>
+                    <h5>R$ {{ pedido.total|floatformat:2 }}</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="d-flex gap-2 justify-content-end">
+              <a href="{% url 'pedidos:detail' pedido.pk %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+              </a>
+              <button type="submit" class="btn btn-primary" onclick="return confirmarEdicao()">
+                <i class="fas fa-save"></i> Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Máscaras para os campos
+document.addEventListener('DOMContentLoaded', function() {
+  // Máscara para CEP
+  const cepInput = document.getElementById('endereco_cep');
+  cepInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+    e.target.value = value;
+  });
+
+  // Máscara para telefone
+  const telefoneInput = document.getElementById('cliente_telefone');
+  telefoneInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 10) {
+      value = value.replace(/^(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    } else {
+      value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+    e.target.value = value;
+  });
+
+  // Máscara para CPF
+  const cpfInput = document.getElementById('cliente_cpf');
+  cpfInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    e.target.value = value;
+  });
+
+  // Máscara para UF (maiúscula)
+  const ufInput = document.getElementById('endereco_estado');
+  ufInput.addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+  });
+});
+
+function confirmarEdicao() {
+  return showConfirm(
+    'Salvar Alterações',
+    'Tem certeza que deseja salvar as alterações no pedido?',
+    function() {
+      document.getElementById('editForm').submit();
+    }
+  );
+}
+</script>
+{% endblock %}

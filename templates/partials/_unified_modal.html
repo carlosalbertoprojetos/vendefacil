@@ -1,0 +1,175 @@
+{% comment %}
+Template unificado para exibir todos os tipos de mensagens em modais Bootstrap.
+Uso: {% include 'partials/_unified_modal.html' %}
+{% endcomment %}
+
+<!-- Modal unificado para mensagens -->
+<div class="modal fade" id="unifiedMessageModal" tabindex="-1" aria-labelledby="unifiedMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" id="unifiedMessageHeader">
+        <h5 class="modal-title" id="unifiedMessageModalLabel">
+          <i class="fas fa-info-circle me-2"></i>
+          Notificação
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="unifiedMessageContent">
+          <!-- Conteúdo da mensagem será inserido aqui via JavaScript -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="unifiedMessageButton">
+          <i class="fas fa-check me-1"></i>
+          Entendi
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Função unificada para exibir mensagens
+  function showUnifiedMessage(type, title, message, options = {}) {
+    const modal = new bootstrap.Modal(document.getElementById('unifiedMessageModal'));
+    const header = document.getElementById('unifiedMessageHeader');
+    const titleElement = document.getElementById('unifiedMessageModalLabel');
+    const content = document.getElementById('unifiedMessageContent');
+    const button = document.getElementById('unifiedMessageButton');
+    
+    // Configurar cores e ícones baseado no tipo
+    let headerClass = 'bg-info text-white';
+    let alertClass = 'alert-info';
+    let icon = 'fas fa-info-circle';
+    let buttonClass = 'btn-primary';
+    let buttonText = 'Entendi';
+    let buttonIcon = 'fas fa-check';
+    
+    switch(type) {
+      case 'success':
+        headerClass = 'bg-success text-white';
+        alertClass = 'alert-success';
+        icon = 'fas fa-check-circle';
+        buttonClass = 'btn-success';
+        buttonText = 'Ótimo';
+        buttonIcon = 'fas fa-thumbs-up';
+        break;
+      case 'error':
+      case 'danger':
+        headerClass = 'bg-danger text-white';
+        alertClass = 'alert-danger';
+        icon = 'fas fa-exclamation-circle';
+        buttonClass = 'btn-danger';
+        buttonText = 'Fechar';
+        buttonIcon = 'fas fa-times';
+        break;
+      case 'warning':
+        headerClass = 'bg-warning text-dark';
+        alertClass = 'alert-warning';
+        icon = 'fas fa-exclamation-triangle';
+        buttonClass = 'btn-warning';
+        buttonText = 'Entendi';
+        buttonIcon = 'fas fa-exclamation';
+        break;
+      case 'info':
+      default:
+        headerClass = 'bg-info text-white';
+        alertClass = 'alert-info';
+        icon = 'fas fa-info-circle';
+        buttonClass = 'btn-info';
+        buttonText = 'Entendi';
+        buttonIcon = 'fas fa-info';
+        break;
+    }
+    
+    // Aplicar configurações customizadas se fornecidas
+    if (options.headerClass) headerClass = options.headerClass;
+    if (options.alertClass) alertClass = options.alertClass;
+    if (options.icon) icon = options.icon;
+    if (options.buttonClass) buttonClass = options.buttonClass;
+    if (options.buttonText) buttonText = options.buttonText;
+    if (options.buttonIcon) buttonIcon = options.buttonIcon;
+    
+    // Atualizar header
+    header.className = `modal-header ${headerClass}`;
+    titleElement.innerHTML = `<i class="${icon} me-2"></i>${title}`;
+    
+    // Atualizar conteúdo
+    content.innerHTML = `
+      <div class="alert ${alertClass} mb-0">
+        <i class="${icon} me-2"></i>
+        ${message}
+      </div>
+    `;
+    
+    // Atualizar botão
+    button.className = `btn ${buttonClass}`;
+    button.innerHTML = `<i class="${buttonIcon} me-1"></i>${buttonText}`;
+    
+    // Adicionar botões extras se fornecidos
+    if (options.extraButtons) {
+      const footer = button.parentElement;
+      // Remover botões extras existentes
+      const existingExtraButtons = footer.querySelectorAll('.extra-button');
+      existingExtraButtons.forEach(btn => btn.remove());
+      
+      // Adicionar novos botões extras
+      options.extraButtons.forEach(btnConfig => {
+        const extraButton = document.createElement('button');
+        extraButton.className = `btn ${btnConfig.class || 'btn-outline-secondary'} extra-button me-2`;
+        extraButton.innerHTML = `<i class="${btnConfig.icon || 'fas fa-question'} me-1"></i>${btnConfig.text}`;
+        extraButton.onclick = btnConfig.onclick;
+        footer.insertBefore(extraButton, button);
+      });
+    }
+    
+    // Mostrar modal
+    modal.show();
+    
+    // Executar callback se fornecido
+    if (options.onShow) {
+      options.onShow(modal);
+    }
+  }
+  
+  // Funções de conveniência para diferentes tipos de mensagem
+  window.showSuccessMessage = function(title, message, options = {}) {
+    showUnifiedMessage('success', title, message, options);
+  };
+  
+  window.showErrorMessage = function(title, message, options = {}) {
+    showUnifiedMessage('error', title, message, options);
+  };
+  
+  window.showWarningMessage = function(title, message, options = {}) {
+    showUnifiedMessage('warning', title, message, options);
+  };
+  
+  window.showInfoMessage = function(title, message, options = {}) {
+    showUnifiedMessage('info', title, message, options);
+  };
+  
+  // Função genérica
+  window.showUnifiedMessage = showUnifiedMessage;
+  
+  // Exemplos de uso:
+  // showSuccessMessage('Sucesso!', 'Operação realizada com sucesso.');
+  // showErrorMessage('Erro!', 'Ocorreu um erro inesperado.');
+  // showWarningMessage('Atenção!', 'Verifique os dados informados.');
+  // showInfoMessage('Informação', 'Esta é uma mensagem informativa.');
+  
+  // Exemplo com botões extras:
+  // showErrorMessage('Erro!', 'Deseja tentar novamente?', {
+  //   extraButtons: [
+  //     {
+  //       text: 'Tentar Novamente',
+  //       class: 'btn-outline-danger',
+  //       icon: 'fas fa-redo',
+  //       onclick: function() { console.log('Tentar novamente'); }
+  //     }
+  //   ]
+  // });
+});
+</script>

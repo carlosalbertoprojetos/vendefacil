@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+{% block title %}Configurações da Empresa - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_messages.html' %}
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 m-0">Configurações da Empresa</h1>
+    <a href="{% url 'configuracoes:home' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Dados da Empresa</h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="razao_social" class="form-label">Razão Social</label>
+                  <input type="text" class="form-control" id="razao_social" name="razao_social" value="">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="nome_fantasia" class="form-label">Nome Fantasia</label>
+                  <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" value="">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="cnpj" class="form-label">CNPJ</label>
+                  <input type="text" class="form-control" id="cnpj" name="cnpj" value="">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="telefone" class="form-label">Telefone</label>
+                  <input type="text" class="form-control" id="telefone" name="telefone" value="">
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="email" name="email" value="">
+            </div>
+            <div class="mb-3">
+              <label for="whatsapp" class="form-label">WhatsApp</label>
+              <input type="text" class="form-control" id="whatsapp" name="whatsapp" value="">
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Informações</h5>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">
+            Configure os dados da sua empresa para personalizar o sistema.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

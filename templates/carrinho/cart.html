@@ -1,0 +1,112 @@
+{% extends 'base/base.html' %}
+{% block title %}Carrinho{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  {% include 'partials/_messages.html' %}
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Produto</th>
+                <th>Qtd</th>
+                <th class="text-end">Preço Unit.</th>
+                <th class="text-end">Desconto</th>
+                <th class="text-end">Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="cart-body">
+              {% for item in cart %}
+              <tr data-id="{{ item.produto.id }}">
+                <td>{{ item.produto.nome }}</td>
+                <td style="max-width: 120px;">
+                  <div class="input-group input-group-sm">
+                    <button class="btn btn-outline-secondary btn-minus">-</button>
+                    <input class="form-control text-center quantity" value="{{ item.quantidade }}">
+                    <button class="btn btn-outline-secondary btn-plus">+</button>
+                  </div>
+                </td>
+                <td class="text-end">
+                  {% if item.produto.preco_promocional and item.produto.em_promocao %}
+                    <div class="d-flex flex-column">
+                      <span class="text-decoration-line-through text-muted small">R$ {{ item.produto.preco|floatformat:2 }}</span>
+                      <span class="text-success fw-bold">R$ {{ item.preco|floatformat:2 }}</span>
+                    </div>
+                  {% else %}
+                    <span>R$ {{ item.preco|floatformat:2 }}</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  {% if item.desconto_total %}
+                    <span class="text-success fw-bold">-R$ {{ item.desconto_total|floatformat:2 }}</span>
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </td>
+                <td class="text-end fw-bold">R$ {{ item.total|floatformat:2 }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-danger btn-remove">Remover</button>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="6" class="text-center text-muted py-4">Seu carrinho está vazio.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">Resumo</div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-6">Subtotal</dt><dd class="col-6 text-end">R$ {{ cart.get_total_price|floatformat:2 }}</dd>
+          </dl>
+          <a href="{% url 'pagamento:checkout' %}" class="btn btn-primary w-100 mt-3">Finalizar compra</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('click', function(e){
+  const row = e.target.closest('tr[data-id]');
+  if(!row) return;
+  const productId = row.dataset.id;
+  if(e.target.classList.contains('btn-remove')){
+    // Usar modal de confirmação
+    if (typeof showConfirm === 'function') {
+      showConfirm(
+        'Deseja remover este item do carrinho?',
+        'Remover Item',
+        function() {
+          // Usuário confirmou, remover item
+          fetch('{% url 'carrinho:remove_ajax' %}', {method:'POST', headers:{'X-CSRFToken': '{{ csrf_token }}','Content-Type':'application/json'}, body: JSON.stringify({product_id: productId})}).then(()=>location.reload());
+        }
+      );
+    } else {
+      // Fallback para confirm nativo
+      if (confirm('Deseja remover este item do carrinho?')) {
+        fetch('{% url 'carrinho:remove_ajax' %}', {method:'POST', headers:{'X-CSRFToken': '{{ csrf_token }}','Content-Type':'application/json'}, body: JSON.stringify({product_id: productId})}).then(()=>location.reload());
+      }
+    }
+  }
+  if(e.target.classList.contains('btn-plus') || e.target.classList.contains('btn-minus')){
+    const input = row.querySelector('.quantity');
+    let q = parseInt(input.value||'1');
+    q += e.target.classList.contains('btn-plus') ? 1 : -1;
+    if(q < 1) q = 1;
+    fetch('{% url 'carrinho:update_ajax' %}', {method:'POST', headers:{'X-CSRFToken': '{{ csrf_token }}','Content-Type':'application/json'}, body: JSON.stringify({product_id: productId, quantity: q})}).then(()=>location.reload());
+  }
+});
+</script>
+{% endblock %}
+
+

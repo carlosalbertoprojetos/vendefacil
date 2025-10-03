@@ -1,0 +1,338 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard - VendaSimples{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">Dashboard</h1>
+        </div>
+    </div>
+    
+    {% if user.role == 'SUPER' %}
+        <!-- Dashboard do Administrador -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_usuarios }}</h4>
+                                <p class="mb-0">Usuários</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_produtos }}</h4>
+                                <p class="mb-0">Produtos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-box fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_pedidos }}</h4>
+                                <p class="mb-0">Pedidos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-shopping-cart fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>R$ {{ vendas_30_dias|floatformat:2 }}</h4>
+                                <p class="mb-0">Vendas (30 dias)</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Pedidos por Status</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for status in pedidos_por_status %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-secondary">{{ status.status }}</span>
+                            <span class="fw-bold">{{ status.count }}</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">Nenhum pedido encontrado.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Pedidos Recentes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for pedido in pedidos_recentes %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <span class="fw-bold">{{ pedido.numero }}</span>
+                                <br>
+                                <small class="text-muted">{{ pedido.vendedor.get_full_name }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-primary">{{ pedido.get_status_display }}</span>
+                                <br>
+                                <small class="text-muted">{{ pedido.created_at|date:'d/m/Y' }}</small>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">Nenhum pedido recente.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% elif user.role == 'EMPRESA' %}
+        <!-- Dashboard da Empresa -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_produtos }}</h4>
+                                <p class="mb-0">Produtos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-box fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_pedidos }}</h4>
+                                <p class="mb-0">Pedidos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-shopping-cart fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>R$ {{ vendas_30_dias|floatformat:2 }}</h4>
+                                <p class="mb-0">Vendas (30 dias)</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ vendedores|length }}</h4>
+                                <p class="mb-0">Vendedores</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Informações da Empresa</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Nome:</strong> {{ empresa.nome_fantasia }}</p>
+                        <p><strong>CNPJ:</strong> {{ empresa.cnpj }}</p>
+                        <p><strong>Telefone:</strong> {{ empresa.telefone }}</p>
+                        <p><strong>WhatsApp:</strong> {{ empresa.whatsapp }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Pedidos por Status</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for status in pedidos_por_status %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-secondary">{{ status.status }}</span>
+                            <span class="fw-bold">{{ status.count }}</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">Nenhum pedido encontrado.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% elif user.role == 'VENDEDOR' %}
+        <!-- Dashboard do Vendedor -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_produtos }}</h4>
+                                <p class="mb-0">Produtos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-box fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_pedidos }}</h4>
+                                <p class="mb-0">Pedidos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-shopping-cart fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>R$ {{ vendas_30_dias|floatformat:2 }}</h4>
+                                <p class="mb-0">Vendas (30 dias)</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ produtos_baixo_estoque|length }}</h4>
+                                <p class="mb-0">Baixo Estoque</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Pedidos Recentes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for pedido in pedidos_recentes %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <span class="fw-bold">{{ pedido.numero }}</span>
+                                <br>
+                                <small class="text-muted">{{ pedido.cliente_nome }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-primary">{{ pedido.get_status_display }}</span>
+                                <br>
+                                <small class="text-muted">R$ {{ pedido.total|floatformat:2 }}</small>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">Nenhum pedido recente.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Produtos com Baixo Estoque</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for produto in produtos_baixo_estoque %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <span class="fw-bold">{{ produto.nome }}</span>
+                                <br>
+                                <small class="text-muted">SKU: {{ produto.sku }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-warning">{{ produto.estoque }} unidades</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">Todos os produtos com estoque adequado.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

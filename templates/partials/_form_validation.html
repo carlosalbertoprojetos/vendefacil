@@ -1,0 +1,109 @@
+{% comment %}
+Template para exibir validação de formulário completo.
+Uso: {% include 'partials/_form_validation.html' with form=form %}
+{% endcomment %}
+
+<div class="form-validation" data-form="{{ form.prefix|default:'form' }}">
+  {% if form.errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <div class="d-flex align-items-start">
+        <i class="fas fa-exclamation-circle me-2 mt-1"></i>
+        <div class="flex-grow-1">
+          <h6 class="alert-heading mb-2">
+            <i class="fas fa-times-circle me-1"></i>
+            Erro na validação do formulário
+          </h6>
+          
+          {% if form.non_field_errors %}
+            <div class="mb-3">
+              <strong>Erros gerais:</strong>
+              <ul class="mb-0">
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          
+          {% if form.errors %}
+            <div class="mb-0">
+              <strong>Erros nos campos:</strong>
+              <ul class="mb-0">
+                {% for field, errors in form.errors.items %}
+                  {% if field != '__all__' %}
+                    <li>
+                      <strong>{{ field|title }}:</strong>
+                      {% for error in errors %}
+                        {{ error }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+  {% endif %}
+  
+  <div class="form-validation-feedback d-none">
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle me-2"></i>
+      Formulário válido
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('[data-form="{{ form.prefix|default:'form' }}"]');
+  const formElement = form.querySelector('form');
+  const validationFeedback = form.querySelector('.form-validation-feedback');
+  
+  if (formElement && validationFeedback) {
+    // Função para validar formulário completo
+    function validateForm() {
+      const inputs = formElement.querySelectorAll('input, select, textarea');
+      let isValid = true;
+      let errorCount = 0;
+      
+      inputs.forEach(function(input) {
+        if (input.hasAttribute('required') && !input.value.trim()) {
+          isValid = false;
+          errorCount++;
+        }
+      });
+      
+      if (isValid) {
+        validationFeedback.classList.remove('d-none');
+        validationFeedback.querySelector('.alert').classList.remove('alert-danger');
+        validationFeedback.querySelector('.alert').classList.add('alert-success');
+        validationFeedback.querySelector('.alert').innerHTML = 
+          '<i class="fas fa-check-circle me-2"></i>Formulário válido';
+      } else {
+        validationFeedback.classList.remove('d-none');
+        validationFeedback.querySelector('.alert').classList.remove('alert-success');
+        validationFeedback.querySelector('.alert').classList.add('alert-danger');
+        validationFeedback.querySelector('.alert').innerHTML = 
+          '<i class="fas fa-exclamation-circle me-2"></i>Formulário inválido - ' + errorCount + ' erro(s) encontrado(s)';
+      }
+    }
+    
+    // Adicionar listeners
+    formElement.addEventListener('submit', function(event) {
+      validateForm();
+      if (!isValid) {
+        event.preventDefault();
+      }
+    });
+    
+    // Validar ao sair de campos obrigatórios
+    const requiredInputs = formElement.querySelectorAll('input[required], select[required], textarea[required]');
+    requiredInputs.forEach(function(input) {
+      input.addEventListener('blur', validateForm);
+    });
+  }
+});
+</script>
