@@ -637,10 +637,11 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "phone"]
+        fields = ["first_name", "last_name", "email", "phone"]
         widgets = {
             "first_name": forms.TextInput(attrs={"class": "form-control"}),
             "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
             "phone": forms.TextInput(
                 attrs={"class": "form-control", "data-mask": "(00) 00000-0000"}
             ),
@@ -697,6 +698,35 @@ class UserProfileForm(forms.ModelForm):
             raise ValidationError("O sobrenome deve conter apenas letras e espaços.")
 
         return last_name
+
+    def clean_email(self):
+        """Validação do email"""
+        email = self.cleaned_data.get("email")
+
+        if not email:
+            raise ValidationError("O email é obrigatório.")
+
+        email = email.strip().lower()
+
+        if len(email) > 254:
+            raise ValidationError("O email deve ter no máximo 254 caracteres.")
+
+        # Verificar formato do email
+        import re
+
+        email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_regex, email):
+            raise ValidationError("Digite um email válido.")
+
+        # Verificar se o email já existe para outro usuário
+        if (
+            User.objects.filter(email__iexact=email)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
+            raise ValidationError("Este email já está em uso por outro usuário.")
+
+        return email
 
     def clean_phone(self):
         """Validação do telefone"""

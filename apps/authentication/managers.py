@@ -50,24 +50,35 @@ class UserManager(BaseUserManager):
         )
 
     def get_by_natural_key(self, username):
-        """Permite login com email ou nome completo"""
-        # Tenta primeiro por email
+        """Permite login com email ou nome completo, tolerante a duplicatas."""
+        # Tenta por email (case-insensitive) e pega o primeiro determinístico
+        user = self.filter(email__iexact=username).order_by("id").first()
+        if user:
+            return user
+
+        # Tenta por first_name exato
+        user = self.filter(first_name__iexact=username).order_by("id").first()
+        if user:
+            return user
+
+        # Tenta por nome completo (first_name + last_name)
         try:
-            return self.get(email__iexact=username)
-        except self.model.DoesNotExist:
-            # Se não encontrar por email, tenta por nome completo
-            try:
-                return self.get(first_name__iexact=username)
-            except self.model.DoesNotExist:
-                # Se não encontrar por nome, tenta por nome completo (first_name + last_name)
-                try:
-                    return self.get(
-                        first_name__iexact=username.split()[0],
-                        last_name__iexact=username.split()[-1],
+            parts = username.split()
+            if len(parts) >= 2:
+                user = (
+                    self.filter(
+                        first_name__iexact=parts[0], last_name__iexact=parts[-1]
                     )
-                except (self.model.DoesNotExist, IndexError):
-                    # Se não encontrar, levanta a exceção original
-                    raise self.model.DoesNotExist
+                    .order_by("id")
+                    .first()
+                )
+                if user:
+                    return user
+        except Exception:
+            pass
+
+        # Não encontrado
+        raise self.model.DoesNotExist
 
     def active(self):
         """Retorna apenas usuários ativos"""
@@ -82,27 +93,22 @@ class UserManager(BaseUserManager):
         return self.filter(role=role)
 
     def authenticate_user(self, username, password):
-        """Autentica usuário por email ou nome"""
-        from django.contrib.auth.hashers import check_password
+        """Autentica usuário por email ou nome, evitando MultipleObjectsReturned."""
+        # Prioriza email (case-insensitive)
+        user = self.filter(email__iexact=username).order_by("id").first()
 
-        # Tenta encontrar o usuário por email ou nome
-        user = None
-        try:
-            # Primeiro tenta por email
-            user = self.get(email__iexact=username)
-        except self.model.DoesNotExist:
-            try:
-                # Tenta por nome completo (first_name + last_name)
-                if " " in username:
-                    first_name, last_name = username.split(" ", 1)
-                    user = self.get(
+        if not user:
+            if " " in username:
+                first_name, last_name = username.split(" ", 1)
+                user = (
+                    self.filter(
                         first_name__iexact=first_name, last_name__iexact=last_name
                     )
-                else:
-                    # Tenta apenas por first_name
-                    user = self.get(first_name__iexact=username)
-            except self.model.DoesNotExist:
-                pass
+                    .order_by("id")
+                    .first()
+                )
+            else:
+                user = self.filter(first_name__iexact=username).order_by("id").first()
 
         if user and user.check_password(password) and user.is_active:
             return user

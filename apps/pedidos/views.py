@@ -144,6 +144,20 @@ def pedido_edit(request, pk):
 
             pedido.data_entrega_prevista = parse_datetime(data_entrega)
 
+        # Atualiza status se fornecido
+        novo_status = request.POST.get("status")
+        if novo_status and novo_status in dict(StatusPedido.choices):
+            status_anterior = pedido.status
+            if status_anterior != novo_status:
+                pedido.status = novo_status
+                # Cria histórico de mudança de status
+                pedido.historico_status.create(
+                    status_anterior=status_anterior,
+                    status_novo=novo_status,
+                    usuario=request.user,
+                    observacoes=request.POST.get("status_observacoes", ""),
+                )
+
         pedido.save()
         messages.success(request, "Pedido atualizado com sucesso!")
         return redirect("pedidos:detail", pk=pedido.pk)

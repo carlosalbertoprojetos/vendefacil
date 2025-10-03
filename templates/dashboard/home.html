@@ -75,6 +75,39 @@
             </div>
         </div>
 
+        <div class="row mt-0">
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ produtos_ativos }}</h4>
+                                <p class="mb-0">Produtos Ativos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-toggle-on fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>R$ {{ vendas_hoje|floatformat:2 }}</h4>
+                                <p class="mb-0">Vendas Hoje</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-day fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
@@ -115,6 +148,39 @@
                         {% empty %}
                         <p class="text-muted">Nenhum pedido recente.</p>
                         {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-0">
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ produtos_ativos }}</h4>
+                                <p class="mb-0">Produtos Ativos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-toggle-on fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>R$ {{ vendas_hoje|floatformat:2 }}</h4>
+                                <p class="mb-0">Vendas Hoje</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-day fa-2x"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -178,6 +244,39 @@
                             </div>
                             <div class="align-self-center">
                                 <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-0">
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ produtos_ativos }}</h4>
+                                <p class="mb-0">Produtos Ativos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-toggle-on fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>R$ {{ vendas_hoje|floatformat:2 }}</h4>
+                                <p class="mb-0">Vendas Hoje</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-day fa-2x"></i>
                             </div>
                         </div>
                     </div>

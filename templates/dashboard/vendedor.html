@@ -104,7 +104,7 @@
                                 Produtos Ativos
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                0
+                                {{ produtos_ativos|default:0 }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -124,7 +124,7 @@
                                 Vendas Hoje
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                R$ 0,00
+                                R$ {{ vendas_hoje|default:0|floatformat:2 }}
                             </div>
                         </div>
                         <div class="col-auto">

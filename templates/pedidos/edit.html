@@ -134,15 +134,26 @@
               </div>
               <div class="col-md-6">
                 <div class="mb-3">
-                  <label class="form-label">Status Atual</label>
-                  <div class="form-control-plaintext">
-                    <span class="badge bg-primary">{{ pedido.get_status_display }}</span>
-                  </div>
+                  <label for="status" class="form-label">Status do Pedido *</label>
+                  <select class="form-control" id="status" name="status" required>
+                    {% for value, label in status_choices %}
+                      <option value="{{ value }}" {% if pedido.status == value %}selected{% endif %}>
+                        {{ label }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="mb-3" id="status_observacoes_container" style="display: none;">
+                  <label for="status_observacoes" class="form-label">Observações sobre Mudança de Status</label>
+                  <textarea class="form-control" id="status_observacoes" name="status_observacoes" rows="2" 
+                            placeholder="Observações sobre a mudança de status (opcional)..."></textarea>
                 </div>
               </div>
               <div class="col-12">
                 <div class="mb-3">
-                  <label for="observacoes" class="form-label">Observações</label>
+                  <label for="observacoes" class="form-label">Observações Gerais</label>
                   <textarea class="form-control" id="observacoes" name="observacoes" rows="3" 
                             placeholder="Observações sobre o pedido...">{{ pedido.observacoes }}</textarea>
                 </div>
@@ -242,6 +253,24 @@ document.addEventListener('DOMContentLoaded', function() {
   ufInput.addEventListener('input', function(e) {
     e.target.value = e.target.value.toUpperCase();
   });
+
+  // Controle do campo de observações de status
+  const statusSelect = document.getElementById('status');
+  const statusObservacoesDiv = document.getElementById('status_observacoes_container');
+  const statusOriginal = statusSelect.value;
+
+  function toggleStatusObservacoes() {
+    if (statusSelect.value !== statusOriginal) {
+      statusObservacoesDiv.style.display = 'block';
+    } else {
+      statusObservacoesDiv.style.display = 'none';
+    }
+  }
+
+  statusSelect.addEventListener('change', toggleStatusObservacoes);
+  
+  // Inicializar estado
+  toggleStatusObservacoes();
 });
 
 function confirmarEdicao() {

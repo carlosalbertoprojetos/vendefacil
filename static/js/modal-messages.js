@@ -6,6 +6,19 @@
 // Aguardar o carregamento do DOM
 document.addEventListener('DOMContentLoaded', function () {
 
+    // Função global para limpar backdrops de modal
+    window.clearModalBackdrops = function () {
+        // Remover todos os backdrops de modal
+        document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
+            backdrop.remove();
+        });
+
+        // Remover classes do body que causam o problema
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    };
+
     // Função para exibir mensagem de sucesso
     window.showSuccess = function (message, title = 'Sucesso!', options = {}) {
         if (typeof showSuccessMessage === 'function') {
@@ -56,7 +69,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         icon: 'fas fa-check',
                         onclick: function () {
                             if (onConfirm) onConfirm();
-                            bootstrap.Modal.getInstance(document.getElementById('unifiedMessageModal')).hide();
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('unifiedMessageModal'));
+                            if (modal) {
+                                modal.hide();
+                            }
+                            // Limpar backdrop após fechar
+                            setTimeout(window.clearModalBackdrops, 100);
                         }
                     }
                 ]
@@ -173,6 +191,14 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Promessa rejeitada:', event.reason);
         showError('Ocorreu um erro na comunicação com o servidor. Por favor, tente novamente.', 'Erro de comunicação');
     });
+
+    // Limpar backdrops quando qualquer modal for fechado
+    document.addEventListener('hidden.bs.modal', function (event) {
+        window.clearModalBackdrops();
+    });
+
+    // Limpar backdrops quando a página carrega (caso tenha ficado algum residual)
+    window.clearModalBackdrops();
 
     // Exemplos de uso (comentados):
     /*

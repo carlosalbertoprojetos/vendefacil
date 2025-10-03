@@ -3,6 +3,7 @@ Views for dashboard app.
 """
 
 from django.shortcuts import render
+from django.db import models
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .decorators import role_required
@@ -31,6 +32,20 @@ def home(request):
         total_produtos = Produto.objects.count()
         total_pedidos = Pedido.objects.count()
 
+        # Produtos ativos (disponíveis e não deletados)
+        produtos_ativos = Produto.active_objects.filter(disponivel=True).count()
+
+        # Vendas de hoje
+        hoje = timezone.localdate()
+        vendas_hoje = (
+            Pedido.objects.filter(
+                status__in=[StatusPedido.CONFIRMADO, StatusPedido.ENTREGUE]
+            )
+            .filter(models.Q(created_at__date=hoje) | models.Q(updated_at__date=hoje))
+            .aggregate(total=Sum("total"))["total"]
+            or 0
+        )
+
         # Pedidos por status
         pedidos_por_status = (
             Pedido.objects.values("status")
@@ -58,6 +73,8 @@ def home(request):
                 "total_usuarios": total_usuarios,
                 "total_produtos": total_produtos,
                 "total_pedidos": total_pedidos,
+                "produtos_ativos": produtos_ativos,
+                "vendas_hoje": vendas_hoje,
                 "pedidos_por_status": pedidos_por_status,
                 "vendas_30_dias": vendas_30_dias,
                 "pedidos_recentes": pedidos_recentes,
@@ -75,12 +92,27 @@ def home(request):
         total_produtos = Produto.objects.filter(
             vendedor__profile__empresa=user.profile.empresa
         ).count()
+        produtos_ativos = Produto.active_objects.filter(
+            vendedor__profile__empresa=user.profile.empresa,
+            disponivel=True,
+        ).count()
 
         # Pedidos da empresa
         pedidos_empresa = Pedido.objects.filter(
             vendedor__profile__empresa=user.profile.empresa
         )
         total_pedidos = pedidos_empresa.count()
+
+        # Vendas de hoje
+        hoje = timezone.localdate()
+        vendas_hoje = (
+            pedidos_empresa.filter(
+                status__in=[StatusPedido.CONFIRMADO, StatusPedido.ENTREGUE]
+            )
+            .filter(models.Q(created_at__date=hoje) | models.Q(updated_at__date=hoje))
+            .aggregate(total=Sum("total"))["total"]
+            or 0
+        )
 
         # Vendas dos últimos 30 dias
         data_30_dias_atras = timezone.now() - timedelta(days=30)
@@ -111,6 +143,8 @@ def home(request):
                 "empresa": user.profile.empresa,
                 "total_produtos": total_produtos,
                 "total_pedidos": total_pedidos,
+                "produtos_ativos": produtos_ativos,
+                "vendas_hoje": vendas_hoje,
                 "vendas_30_dias": vendas_30_dias,
                 "pedidos_por_status": pedidos_por_status,
                 "vendedores": vendedores,
@@ -126,10 +160,25 @@ def home(request):
 
         # Produtos do vendedor
         total_produtos = Produto.objects.filter(vendedor=user).count()
+        produtos_ativos = Produto.active_objects.filter(
+            vendedor=user,
+            disponivel=True,
+        ).count()
 
         # Pedidos do vendedor
         pedidos_vendedor = Pedido.objects.filter(vendedor=user)
         total_pedidos = pedidos_vendedor.count()
+
+        # Vendas de hoje
+        hoje = timezone.localdate()
+        vendas_hoje = (
+            pedidos_vendedor.filter(
+                status__in=[StatusPedido.CONFIRMADO, StatusPedido.ENTREGUE]
+            )
+            .filter(models.Q(created_at__date=hoje) | models.Q(updated_at__date=hoje))
+            .aggregate(total=Sum("total"))["total"]
+            or 0
+        )
 
         # Vendas dos últimos 30 dias
         data_30_dias_atras = timezone.now() - timedelta(days=30)
@@ -160,6 +209,8 @@ def home(request):
             {
                 "total_produtos": total_produtos,
                 "total_pedidos": total_pedidos,
+                "produtos_ativos": produtos_ativos,
+                "vendas_hoje": vendas_hoje,
                 "vendas_30_dias": vendas_30_dias,
                 "pedidos_por_status": pedidos_por_status,
                 "pedidos_recentes": pedidos_recentes,

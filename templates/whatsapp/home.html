@@ -12,49 +12,13 @@
           <i class="fab fa-whatsapp text-success me-2"></i>
           Configurações WhatsApp
         </h1>
-        <div class="badge bg-success">
-          <i class="fas fa-check-circle me-1"></i>
-          Conectado
-        </div>
       </div>
     </div>
   </div>
 
   <div class="row g-4">
-    <!-- Status da Conexão -->
-    <div class="col-lg-4">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="fas fa-link me-2"></i>
-            Status da Conexão
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="d-flex align-items-center mb-3">
-            <div class="me-3">
-              <i class="fas fa-circle text-success" style="font-size: 1.2rem;"></i>
-            </div>
-            <div>
-              <h6 class="mb-0">WhatsApp Conectado</h6>
-              <small class="text-muted">Última conexão: há 2 minutos</small>
-            </div>
-          </div>
-          
-          <div class="d-grid gap-2">
-            <button class="btn btn-outline-success" onclick="testarConexao()">
-              <i class="fas fa-sync-alt me-2"></i>Testar Conexão
-            </button>
-            <button class="btn btn-outline-danger" onclick="desconectarWhatsApp()">
-              <i class="fas fa-unlink me-2"></i>Desconectar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Configurações de Mensagens -->
-    <div class="col-lg-8">
+    <div class="col-lg-12">
       <div class="card">
         <div class="card-header">
           <h5 class="mb-0">
@@ -70,14 +34,14 @@
               <div class="col-md-6 mb-3">
                 <label for="numero_whatsapp" class="form-label">Número do WhatsApp</label>
                 <input type="tel" class="form-control" id="numero_whatsapp" name="numero_whatsapp" 
-                       value="+55 11 99999-9999" data-mask="+00 (00) 00000-0000">
+                       value="{{ settings.numero_whatsapp|default:'' }}" data-mask="+00 (00) 00000-0000">
                 <div class="form-text">Número que será usado para enviar mensagens</div>
               </div>
               
               <div class="col-md-6 mb-3">
                 <label for="nome_empresa" class="form-label">Nome da Empresa</label>
                 <input type="text" class="form-control" id="nome_empresa" name="nome_empresa" 
-                       value="VendaSimples">
+                       value="{{ settings.nome_empresa|default:'' }}">
                 <div class="form-text">Nome que aparecerá nas mensagens</div>
               </div>
             </div>
@@ -85,36 +49,20 @@
             <div class="mb-3">
               <label for="mensagem_pedido" class="form-label">Mensagem de Pedido</label>
               <textarea class="form-control" id="mensagem_pedido" name="mensagem_pedido" rows="4"
-                        placeholder="Digite a mensagem que será enviada quando um pedido for realizado...">Olá! Seu pedido foi realizado com sucesso! 🎉
-
-📦 **Pedido:** #{{pedido_numero}}
-💰 **Total:** R$ {{pedido_total}}
-📅 **Data:** {{pedido_data}}
-
-Acompanhe seu pedido em tempo real e receba atualizações automáticas.
-
-Obrigado por escolher a VendaSimples! 🛍️</textarea>
+                        placeholder="Digite a mensagem que será enviada quando um pedido for realizado...">{{ settings.mensagem_pedido|default:'' }}</textarea>
               <div class="form-text">Use as variáveis: {{pedido_numero}}, {{pedido_total}}, {{pedido_data}}, {{cliente_nome}}</div>
             </div>
 
             <div class="mb-3">
               <label for="mensagem_entrega" class="form-label">Mensagem de Entrega</label>
               <textarea class="form-control" id="mensagem_entrega" name="mensagem_entrega" rows="3"
-                        placeholder="Digite a mensagem que será enviada quando o pedido for enviado...">🚚 **Seu pedido está a caminho!**
-
-📦 Pedido: #{{pedido_numero}}
-🚛 Código de rastreamento: {{codigo_rastreamento}}
-📅 Previsão de entrega: {{previsao_entrega}}
-
-Acompanhe seu pedido: {{link_rastreamento}}
-
-Obrigado! 🎉</textarea>
+                        placeholder="Digite a mensagem que será enviada quando o pedido for enviado...">{{ settings.mensagem_entrega|default:'' }}</textarea>
             </div>
 
             <div class="row">
               <div class="col-md-6 mb-3">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="enviar_pedido" name="enviar_pedido" checked>
+                  <input class="form-check-input" type="checkbox" id="enviar_pedido" name="enviar_pedido" {% if settings.enviar_pedido %}checked{% endif %}>
                   <label class="form-check-label" for="enviar_pedido">
                     Enviar mensagem quando pedido for realizado
                   </label>
@@ -123,7 +71,7 @@ Obrigado! 🎉</textarea>
               
               <div class="col-md-6 mb-3">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="enviar_entrega" name="enviar_entrega" checked>
+                  <input class="form-check-input" type="checkbox" id="enviar_entrega" name="enviar_entrega" {% if settings.enviar_entrega %}checked{% endif %}>
                   <label class="form-check-label" for="enviar_entrega">
                     Enviar mensagem quando pedido for enviado
                   </label>

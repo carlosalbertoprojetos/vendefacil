@@ -45,7 +45,7 @@
             </div>
             
             <div class="mb-3">
-              <label for="{{ user_form.email.id_for_label }}" class="form-label">E-mail</label>
+              <label for="{{ user_form.email.id_for_label }}" class="form-label">E-mail *</label>
               {{ user_form.email }}
               {% if user_form.email.errors %}
                 <div class="text-danger small">
@@ -57,11 +57,11 @@
             </div>
             
             <div class="mb-3">
-              <label for="{{ profile_form.phone.id_for_label }}" class="form-label">Telefone</label>
-              {{ profile_form.phone }}
-              {% if profile_form.phone.errors %}
+              <label for="{{ user_form.phone.id_for_label }}" class="form-label">Telefone</label>
+              {{ user_form.phone }}
+              {% if user_form.phone.errors %}
                 <div class="text-danger small">
-                  {% for error in profile_form.phone.errors %}
+                  {% for error in user_form.phone.errors %}
                     <div>{{ error }}</div>
                   {% endfor %}
                 </div>
@@ -82,6 +82,11 @@
             
             <div class="mb-3">
               <label for="{{ profile_form.avatar.id_for_label }}" class="form-label">Avatar</label>
+              {% if profile_form.instance.avatar %}
+              <div class="mb-2">
+                <img src="{{ profile_form.instance.avatar.url }}" alt="Avatar atual" class="img-thumbnail" style="max-width: 150px; height: auto;">
+              </div>
+              {% endif %}
               {{ profile_form.avatar }}
               {% if profile_form.avatar.errors %}
                 <div class="text-danger small">
@@ -122,4 +127,107 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Máscara para telefone do usuário
+  const phoneInput = document.getElementById('{{ user_form.phone.id_for_label }}');
+  if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 10) {
+        value = value.replace(/^(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+      } else {
+        value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+      }
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para telefone do perfil
+  const profilePhoneInput = document.getElementById('{{ profile_form.phone.id_for_label }}');
+  if (profilePhoneInput) {
+    profilePhoneInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 10) {
+        value = value.replace(/^(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+      } else {
+        value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+      }
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para WhatsApp do perfil
+  const whatsappInput = document.getElementById('{{ profile_form.whatsapp.id_for_label }}');
+  if (whatsappInput) {
+    whatsappInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 10) {
+        value = value.replace(/^(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+      } else {
+        value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+      }
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para CPF
+  const cpfInput = document.getElementById('{{ profile_form.cpf.id_for_label }}');
+  if (cpfInput) {
+    cpfInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para CEP
+  const cepInput = document.getElementById('{{ profile_form.cep.id_for_label }}');
+  if (cepInput) {
+    cepInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para UF (maiúscula)
+  const ufInput = document.getElementById('{{ profile_form.estado.id_for_label }}');
+  if (ufInput) {
+    ufInput.addEventListener('input', function(e) {
+      e.target.value = e.target.value.toUpperCase();
+    });
+  }
+
+  // Limpar backdrop de modais que podem estar causando tela escura
+  function clearModalBackdrops() {
+    // Remover todos os backdrops de modal
+    document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+      backdrop.remove();
+    });
+    
+    // Remover classes do body que causam o problema
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
+  }
+
+  // Limpar backdrops quando modais são fechados
+  document.addEventListener('hidden.bs.modal', function(event) {
+    clearModalBackdrops();
+  });
+
+  // Limpar backdrops quando a página carrega (caso tenha ficado algum residual)
+  clearModalBackdrops();
+
+  // Limpar backdrops quando o formulário é submetido
+  const profileForm = document.querySelector('form');
+  if (profileForm) {
+    profileForm.addEventListener('submit', function() {
+      clearModalBackdrops();
+    });
+  }
+});
+</script>
 {% endblock %}

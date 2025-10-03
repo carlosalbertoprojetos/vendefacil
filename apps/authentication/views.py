@@ -121,7 +121,14 @@ def profile_view(request):
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            profile_form.save()
+
+            # Garantir salvamento do avatar quando enviado
+            profile_instance = profile_form.save(commit=False)
+            if "avatar" in request.FILES:
+                profile_instance.avatar = request.FILES.get("avatar")
+            profile_instance.user = user
+            profile_instance.save()
+
             messages.success(request, "Perfil atualizado com sucesso!")
             return redirect("authentication:profile")
     else:
