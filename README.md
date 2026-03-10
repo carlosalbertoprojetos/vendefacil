@@ -2,7 +2,7 @@
 
 Sistema completo de catálogo/vitrine de produtos desenvolvido com Django 5.0+.
 
-## 🚀 Características
+## Características
 
 - **Sistema hierárquico de usuários**: Superusuário, Empresa, Vendedor
 - **Gestão completa de produtos**: Upload de múltiplas imagens, categorias, variações
@@ -15,7 +15,7 @@ Sistema completo de catálogo/vitrine de produtos desenvolvido com Django 5.0+.
 - **Sistema de notificações**: Multi-canal
 - **API REST completa**: Com versionamento
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 - **Backend**: Django 5.0+
 - **Banco de Dados**: PostgreSQL 14+
@@ -25,7 +25,7 @@ Sistema completo de catálogo/vitrine de produtos desenvolvido com Django 5.0+.
 - **Task Queue**: Celery 5.3+
 - **Storage**: AWS S3 (configurável para local)
 
-## 📋 Pré-requisitos
+## Pré-requisitos
 
 - Python 3.11+
 - PostgreSQL 14+
@@ -81,7 +81,7 @@ Sistema completo de catálogo/vitrine de produtos desenvolvido com Django 5.0+.
    python manage.py runserver
    ```
 
-## 🗂️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 vendasimples/
@@ -106,7 +106,7 @@ vendasimples/
 └── docs/                      # Documentação
 ```
 
-## 👥 Tipos de Usuário
+## Tipos de Usuário
 
 ### Superusuário
 - Acesso total ao sistema
@@ -123,7 +123,7 @@ vendasimples/
 - Visualização de pedidos
 - Configurações do perfil
 
-## 🔌 API
+## API
 
 A API REST está disponível em `/api/v1/` com documentação automática em `/api/docs/`.
 
@@ -134,7 +134,7 @@ A API REST está disponível em `/api/v1/` com documentação automática em `/a
 - `GET /api/v1/usuarios/` - Lista usuários
 - `GET /api/v1/empresas/` - Lista empresas
 
-## 🚀 Deploy
+## Deploy
 
 ### Produção
 
@@ -153,11 +153,11 @@ A API REST está disponível em `/api/v1/` com documentação automática em `/a
 docker-compose up -d
 ```
 
-## 📝 Licença
+## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
-## 🤝 Contribuição
+## Contribuição
 
 1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
@@ -165,11 +165,11 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## 📞 Suporte
+## Suporte
 
 Para suporte, envie um email para suporte@vendasimples.com.br ou abra uma issue no GitHub.
 
-## 🔄 Changelog
+## Changelog
 
 ### v1.0.0
 - Sistema inicial completo
